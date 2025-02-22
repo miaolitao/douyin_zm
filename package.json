@@ -1,0 +1,27 @@
+{
+  "name": "trae-douyin",
+  "version": "1.0.0",
+  "description": "抖音桌面端应用",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "@ant-design/icons": "^5.2.6",
+    "antd": "^5.12.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  }}
