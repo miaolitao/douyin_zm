@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Layout, Card, Avatar, Button, Row, Col, Tabs, Pagination } from 'antd'
+import React, { useState, useEffect, useRef } from 'react'
+import { Layout, Card, Avatar, Button, Row, Col, Tabs } from 'antd'
 import { HeartOutlined, MessageOutlined, ShareAltOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { categories, sampleVideos } from '../data/videos'
 import { useNavigate } from 'react-router-dom'
@@ -8,24 +8,50 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const [currentCategory, setCurrentCategory] = useState('全部')
   const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const pageSize = 12
 
   const filteredVideos = currentCategory === '全部'
     ? sampleVideos
     : sampleVideos.filter(video => video.category === currentCategory)
 
+  const displayedVideos = filteredVideos.slice(0, currentPage * pageSize)
+
   const handleCategoryChange = (category: string) => {
     setCurrentCategory(category)
     setCurrentPage(1)
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+  const handleScroll = () => {
+    if (!containerRef.current || loading) return
+
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      if (currentPage * pageSize < filteredVideos.length) {
+        setLoading(true)
+        setTimeout(() => {
+          setCurrentPage(prev => prev + 1)
+          setLoading(false)
+        }, 500)
+      }
+    }
   }
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
+  }, [loading, currentCategory])
 
   return (
     <Layout style={{ backgroundColor: '#121212', height: '100%', overflow: 'hidden' }}>
-      <div style={{ padding: '24px', height: '100%', overflowY: 'auto', position: 'relative' }}>
+      <div
+        ref={containerRef}
+        style={{ padding: '24px', height: '100%', overflowY: 'auto', position: 'relative' }}
+      >
         <Tabs
           activeKey={currentCategory}
           onChange={handleCategoryChange}
@@ -36,7 +62,7 @@ const Home: React.FC = () => {
           style={{ marginBottom: '24px' }}
         />
         <Row gutter={[16, 16]}>
-          {filteredVideos.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(video => (
+          {displayedVideos.map(video => (
             <Col key={video.id} xs={24} sm={12} md={8} lg={6}>
               <Card
                 hoverable
@@ -84,15 +110,11 @@ const Home: React.FC = () => {
             </Col>
           ))}
         </Row>
-        <div style={{ textAlign: 'center', marginTop: '24px', marginBottom: '24px' }}>
-          <Pagination
-            current={currentPage}
-            total={filteredVideos.length}
-            pageSize={pageSize}
-            onChange={handlePageChange}
-            style={{ color: '#fff' }}
-          />
-        </div>
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '24px' }}>
+            <span style={{ color: '#fff' }}>加载中...</span>
+          </div>
+        )}
       </div>
     </Layout>
   )
