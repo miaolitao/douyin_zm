@@ -40,7 +40,7 @@ export const sampleVideos: Video[] = [
     title: '为了这个骚曲一定得配张照片',
     description: '为了这个骚曲一定得配张照片，音乐和画面的完美结合',
     poster: 'https://p9-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/oQyEGAeB0Eg0yTFiiAAkiAEaAEKsfVHwOeIlCo~noop.jpeg?biz_tag=pcweb_cover&card_type=303&column_n=0&from=327834062&l=2025082619172323CDE1A7152188145906&lk3s=138a59ce&s=PackSourceEnum_SEARCH&se=false&x-expires=1757415600&x-signature=NPEWTSYEMNC2NjSObyfxDl8%2Fp%2BY%3D',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUrl: 'https://www.douyin.com/aweme/v1/play/?video_id=v1e00fgi0000d1kb7anog65jpkmfes8g&line=0&file_id=3b2ff49702834b56b8367271b27338d4&sign=72275cc0b46d593b60831ebe40cb520b&is_play_url=1&source=PackSourceEnum_PUBLISH_SEARCH',
     duration: 45,
     views: 2500000,
     likes: 180000,
