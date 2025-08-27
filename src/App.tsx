@@ -1,6 +1,6 @@
 import React from 'react'
 import { Layout } from 'antd'
-import { Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TitleBar from './components/TitleBar'
 import Home from './pages/Home'
@@ -12,30 +12,44 @@ import Food from './pages/Food'
 import Knowledge from './pages/Knowledge'
 import Sports from './pages/Sports'
 import VideoDetail from './pages/VideoDetail'
+import Demo from './components/Demo'
 
 const { Content } = Layout
 
 const App: React.FC = () => {
   return (
-    <Layout style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <TitleBar />
-      <Layout style={{ flex: 1, overflow: 'hidden' }}>
-        <Sidebar />
-        <Content style={{ flex: 1, overflow: 'auto', backgroundColor: '#121212' }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/featured" element={<Featured />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/anime" element={<Anime />} />
-            <Route path="/music" element={<Music />} />
-            <Route path="/food" element={<Food />} />
-            <Route path="/knowledge" element={<Knowledge />} />
-            <Route path="/sports" element={<Sports />} />
-            <Route path="/video/:id" element={<VideoDetail />} />
-          </Routes>
-        </Content>
+    <Router>
+      <Layout style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        backgroundColor: '#000000'
+      }}>
+        <TitleBar />
+        <Layout style={{ flex: 1, overflow: 'hidden' }}>
+          <Sidebar />
+          <Content style={{ 
+            flex: 1, 
+            overflow: 'auto', 
+            backgroundColor: '#000000',
+            position: 'relative'
+          }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/featured" element={<Featured />} />
+              <Route path="/game" element={<Game />} />
+              <Route path="/anime" element={<Anime />} />
+              <Route path="/music" element={<Music />} />
+              <Route path="/food" element={<Food />} />
+              <Route path="/knowledge" element={<Knowledge />} />
+              <Route path="/sports" element={<Sports />} />
+              <Route path="/video/:id" element={<VideoDetail />} />
+            </Routes>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </Router>
   )
 }
 

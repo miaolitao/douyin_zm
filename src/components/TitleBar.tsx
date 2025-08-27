@@ -1,82 +1,183 @@
-import React from 'react'
-import { Layout, Input, Button, Badge, Avatar } from 'antd';
-import { MinusOutlined, BorderOutlined, CloseOutlined, SearchOutlined, BellOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
+import React, { useState } from 'react'
+import { Layout, Button, Input, Avatar, Badge } from 'antd'
+import { 
+  SearchOutlined, 
+  BellOutlined, 
+  MessageOutlined, 
+  PlusOutlined,
+  CloseOutlined,
+  MinusOutlined,
+  BorderOutlined
+} from '@ant-design/icons'
+import SearchModal from './SearchModal'
 
 const { Header } = Layout
 
 const TitleBar: React.FC = () => {
-  const handleMinimize = () => {
-    window.electron.minimize()
-  }
-
-  const handleMaximize = () => {
-    window.electron.maximize()
-  }
-
-  const handleClose = () => {
-    window.electron.close()
-  }
+  const [searchModalVisible, setSearchModalVisible] = useState(false)
 
   return (
-    <Header
-      style={{
-        height: 60,
-        padding: '0 16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#121212',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        '-webkit-app-region': 'drag'
-      }}
-    >
-      <div style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: '24px' }}>
-        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>抖音</span>
-        <Input
-          prefix={<SearchOutlined style={{ color: '#666', fontSize: '16px' }} />}
-          placeholder="搜索你感兴趣的内容"
-          style={{
-            width: 300,
-            backgroundColor: '#1d1d1d',
-            border: 'none',
-            borderRadius: '4px',
-            height: '36px',
-            '-webkit-app-region': 'no-drag'
-          }}
-        />
-      </div>
-      <div style={{ '-webkit-app-region': 'no-drag', display: 'flex', alignItems: 'center', gap: '24px' }}>
-        <Button type="text" icon={<BellOutlined style={{ fontSize: '22px' }} />} style={{ color: '#fff' }} />
-        <Badge count={5} style={{ backgroundColor: '#fe2c55' }}>
-          <Button type="text" icon={<MailOutlined style={{ fontSize: '22px' }} />} style={{ color: '#fff' }} />
-        </Badge>
-        <Button 
-          type="text" 
-          icon={<Avatar size={36} icon={<UserOutlined />} style={{ backgroundColor: '#1d1d1d' }} />} 
-          style={{ color: '#fff', padding: 0 }} 
-        />
-        <div style={{ marginLeft: '16px', display: 'flex', alignItems: 'center' }}>
-          <Button
-            type="text"
-            icon={<MinusOutlined style={{ fontSize: 12 }} />}
-            onClick={handleMinimize}
-            style={{ color: '#fff', padding: '8px 12px', minWidth: 'auto' }}
-          />
-          <Button
-            type="text"
-            icon={<BorderOutlined style={{ fontSize: 12 }} />}
-            onClick={handleMaximize}
-            style={{ color: '#fff', padding: '8px 12px', minWidth: 'auto' }}
-          />
-          <Button
-            type="text"
-            icon={<CloseOutlined style={{ fontSize: 12 }} />}
-            onClick={handleClose}
-            style={{ color: '#fff', padding: '8px 12px', minWidth: 'auto', ':hover': { backgroundColor: '#ff4d4f' } }}
-          />
+    <>
+      <Header
+        style={{
+          height: '60px',
+          backgroundColor: '#000000',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          WebkitAppRegion: 'drag'
+        }}
+      >
+        {/* 左侧Logo和搜索 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: '#ff0050',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '18px',
+              fontWeight: 'bold'
+            }}>
+              抖
+            </div>
+            <span style={{ 
+              color: '#fff', 
+              fontSize: '20px', 
+              fontWeight: 'bold',
+              marginLeft: '8px'
+            }}>
+              抖音
+            </span>
+          </div>
+
+          {/* 搜索框 */}
+          <div style={{ position: 'relative' }}>
+            <Input
+              placeholder="搜索视频、用户、音乐"
+              prefix={<SearchOutlined style={{ color: '#888' }} />}
+              style={{
+                width: '300px',
+                height: '36px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '18px',
+                color: '#fff',
+                WebkitAppRegion: 'no-drag',
+                cursor: 'pointer'
+              }}
+              readOnly
+              onClick={() => setSearchModalVisible(true)}
+            />
+          </div>
         </div>
-      </div>
-    </Header>
+
+        {/* 右侧操作按钮 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', WebkitAppRegion: 'no-drag' }}>
+          {/* 通知 */}
+          <Badge count={3} size="small">
+            <Button
+              type="text"
+              icon={<BellOutlined style={{ fontSize: '20px', color: '#fff' }} />}
+              style={{ 
+                width: '40px', 
+                height: '40px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '20px'
+              }}
+            />
+          </Badge>
+
+          {/* 消息 */}
+          <Badge count={5} size="small">
+            <Button
+              type="text"
+              icon={<MessageOutlined style={{ fontSize: '20px', color: '#fff' }} />}
+              style={{ 
+                width: '40px', 
+                height: '40px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '20px'
+              }}
+            />
+          </Badge>
+
+          {/* 上传按钮 */}
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            style={{
+              height: '36px',
+              backgroundColor: '#ff0050',
+              border: 'none',
+              borderRadius: '18px',
+              fontWeight: 500
+            }}
+          >
+            上传
+          </Button>
+
+          {/* 用户头像 */}
+          <Avatar
+            size={36}
+            src="https://via.placeholder.com/36x36/ff0050/ffffff?text=U"
+            style={{ cursor: 'pointer' }}
+          />
+
+          {/* 窗口控制按钮 */}
+          <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
+            <Button
+              type="text"
+              icon={<MinusOutlined style={{ color: '#888' }} />}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '16px'
+              }}
+            />
+            <Button
+              type="text"
+              icon={<BorderOutlined style={{ color: '#888' }} />}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '16px'
+              }}
+            />
+            <Button
+              type="text"
+              icon={<CloseOutlined style={{ color: '#888' }} />}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '16px'
+              }}
+            />
+          </div>
+        </div>
+      </Header>
+
+      {/* 搜索模态框 */}
+      <SearchModal 
+        visible={searchModalVisible}
+        onClose={() => setSearchModalVisible(false)}
+      />
+    </>
   )
 }
 

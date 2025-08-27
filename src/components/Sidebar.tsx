@@ -1,17 +1,21 @@
 import React from 'react'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Avatar, Button } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
+import type { MenuProps } from 'antd'
 import {
   HomeOutlined,
-  RobotOutlined,
+  FireOutlined,
+  HeartOutlined,
+  UserOutlined,
   PlaySquareOutlined,
   CustomerServiceOutlined,
   CoffeeOutlined,
   ReadOutlined,
   TrophyOutlined,
-  UserOutlined,
-  TeamOutlined,
-  VideoCameraOutlined
+  VideoCameraOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ExperimentOutlined
 } from '@ant-design/icons'
 
 const { Sider } = Layout
@@ -19,74 +23,95 @@ const { Sider } = Layout
 const Sidebar: React.FC = () => {
   const location = useLocation()
 
-  const menuItems = [
-    {
-      key: 'featured',
-      icon: <VideoCameraOutlined style={{ fontSize: '22px' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500 }}>精选</span>
-    },
-    {
-      key: 'recommend',
-      icon: <HomeOutlined style={{ fontSize: '22px' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500 }}>推荐</span>
-    },
-    {
-      key: 'follow',
-      icon: <TeamOutlined style={{ fontSize: '22px' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500 }}>关注</span>
-    },
-    {
-      key: 'friend',
-      icon: <UserOutlined style={{ fontSize: '22px' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500 }}>朋友</span>
-    },
-    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.08)', margin: '12px 0' } },
+  const menuItems: MenuProps['items'] = [
     {
       key: '/',
-      icon: <HomeOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/" style={{ fontSize: '15px', color: '#fff' }}>首页</Link>
+      icon: <HomeOutlined style={{ fontSize: '24px', color: '#fff' }} />,
+      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>首页</span>
+    },
+    {
+      key: '/featured',
+      icon: <FireOutlined style={{ fontSize: '24px', color: '#fff' }} />,
+      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>热门</span>
+    },
+    {
+      key: '/follow',
+      icon: <HeartOutlined style={{ fontSize: '24px', color: '#fff' }} />,
+      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>关注</span>
+    },
+    {
+      key: '/friend',
+      icon: <UserOutlined style={{ fontSize: '24px', color: '#fff' }} />,
+      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>朋友</span>
+    },
+    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.1)', margin: '16px 0' } },
+    {
+      key: '/demo',
+      icon: <ExperimentOutlined style={{ fontSize: '20px', color: '#ff0050' }} />,
+      label: <Link to="/demo" style={{ fontSize: '15px', color: '#ff0050', fontWeight: 600 }}>演示页面</Link>
     },
     {
       key: '/game',
-      icon: <RobotOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/game" style={{ fontSize: '15px', color: '#fff' }}>游戏</Link>
+      icon: <PlaySquareOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/game" style={{ fontSize: '14px', color: '#888' }}>游戏</Link>
     },
     {
       key: '/anime',
-      icon: <PlaySquareOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/anime" style={{ fontSize: '15px', color: '#fff' }}>二次元</Link>
+      icon: <PlaySquareOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/anime" style={{ fontSize: '14px', color: '#888' }}>二次元</Link>
     },
     {
       key: '/music',
-      icon: <CustomerServiceOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/music" style={{ fontSize: '15px', color: '#fff' }}>音乐</Link>
+      icon: <CustomerServiceOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/music" style={{ fontSize: '14px', color: '#888' }}>音乐</Link>
     },
     {
       key: '/food',
-      icon: <CoffeeOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/food" style={{ fontSize: '15px', color: '#fff' }}>美食</Link>
+      icon: <CoffeeOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/food" style={{ fontSize: '14px', color: '#888' }}>美食</Link>
     },
     {
       key: '/knowledge',
-      icon: <ReadOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/knowledge" style={{ fontSize: '15px', color: '#fff' }}>知识</Link>
+      icon: <ReadOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/knowledge" style={{ fontSize: '14px', color: '#888' }}>知识</Link>
     },
     {
       key: '/sports',
-      icon: <TrophyOutlined style={{ fontSize: '20px' }} />,
-      label: <Link to="/sports" style={{ fontSize: '15px', color: '#fff' }}>体育</Link>
+      icon: <TrophyOutlined style={{ fontSize: '20px', color: '#888' }} />,
+      label: <Link to="/sports" style={{ fontSize: '14px', color: '#888' }}>体育</Link>
     }
   ]
 
   return (
     <Sider
-      width={220}
+      width={240}
       style={{
-        backgroundColor: '#121212',
-        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-        paddingTop: '16px'
+        backgroundColor: '#000000',
+        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+        paddingTop: '20px',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
+      {/* 搜索框 */}
+      <div style={{ padding: '0 20px 20px' }}>
+        <Button 
+          icon={<SearchOutlined />} 
+          style={{ 
+            width: '100%', 
+            height: '40px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            border: 'none',
+            color: '#888',
+            borderRadius: '20px',
+            textAlign: 'left'
+          }}
+        >
+          搜索视频和用户
+        </Button>
+      </div>
+
+      {/* 菜单 */}
       <Menu
         mode="inline"
         selectedKeys={[location.pathname]}
@@ -94,10 +119,44 @@ const Sidebar: React.FC = () => {
           height: '100%',
           borderRight: 0,
           backgroundColor: 'transparent',
-          padding: '0 12px'
+          padding: '0 12px',
+          flex: 1
         }}
         items={menuItems}
       />
+
+      {/* 底部用户信息 */}
+      <div style={{ 
+        padding: '20px', 
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        marginTop: 'auto'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+          <Avatar 
+            size={40} 
+            src="https://via.placeholder.com/40x40/ff0050/ffffff?text=U" 
+            style={{ marginRight: '12px' }}
+          />
+          <div>
+            <div style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>用户名</div>
+            <div style={{ color: '#888', fontSize: '12px' }}>查看个人资料</div>
+          </div>
+        </div>
+        <Button 
+          icon={<PlusOutlined />} 
+          style={{ 
+            width: '100%', 
+            height: '36px',
+            backgroundColor: '#ff0050',
+            border: 'none',
+            color: '#fff',
+            borderRadius: '18px',
+            fontWeight: 500
+          }}
+        >
+          上传视频
+        </Button>
+      </div>
     </Sider>
   )
 }

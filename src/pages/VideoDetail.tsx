@@ -49,7 +49,7 @@ const VideoDetail: React.FC = () => {
             bodyStyle={{ padding: 0 }}
           >
             <div style={{ height: '600px' }}>
-              <VideoPlayer videoUrl={video.url} poster={video.poster} />
+              <VideoPlayer videoUrl={video.videoUrl} poster={video.poster} />
             </div>
           </Card>
           

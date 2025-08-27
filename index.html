@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>抖音桌面版</title>
+  <title>抖音 - 记录美好生活</title>
+  <meta name="description" content="抖音桌面端应用 - 记录美好生活，分享精彩瞬间">
+  <meta name="keywords" content="抖音,短视频,社交,娱乐,桌面应用">
   <style>
     * {
       margin: 0;
@@ -11,19 +13,111 @@
       box-sizing: border-box;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: #121212;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #000000;
       color: #ffffff;
       overflow: hidden;
     }
     #root {
       width: 100vw;
       height: 100vh;
+      background-color: #000000;
+    }
+    
+    /* 加载动画 */
+    .loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(45deg, #ff0050, #ff6b35);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 24px;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-text {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    .loading-subtitle {
+      color: #888888;
+      font-size: 14px;
+    }
+    
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 0, 80, 0.3);
+      border-top: 3px solid #ff0050;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 24px;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
   </style>
 </head>
 <body>
+  <!-- 加载动画 -->
+  <div id="loading" class="loading-container">
+    <div class="loading-logo">抖</div>
+    <div class="loading-text">抖音桌面版</div>
+    <div class="loading-subtitle">记录美好生活</div>
+    <div class="loading-spinner"></div>
+  </div>
+  
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+  
+  <script>
+    // 页面加载完成后隐藏加载动画
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.classList.add('fade-out');
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }
+      }, 1000);
+    });
+  </script>
 </body>
 </html>

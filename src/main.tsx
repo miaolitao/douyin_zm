@@ -1,26 +1,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { HashRouter as Router } from 'react-router-dom'
-import { ConfigProvider, theme } from 'antd'
+import { ConfigProvider } from 'antd'
+import zhCN from 'antd/locale/zh_CN'
 import App from './App'
+import './App.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ConfigProvider
+      locale={zhCN}
       theme={{
-        algorithm: theme.darkAlgorithm,
         token: {
-          colorPrimary: '#fe2c55',
-          borderRadius: 2,
-          colorBgContainer: '#121212',
-          colorBgElevated: '#1d1d1d',
-          colorText: '#ffffff'
-        }
+          colorPrimary: '#ff0050',
+          colorBgContainer: '#000000',
+          colorBgElevated: '#000000',
+          colorBgLayout: '#000000',
+          colorText: '#ffffff',
+          colorTextSecondary: '#888888',
+          colorBorder: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: 8,
+        },
       }}
     >
-      <Router>
-        <App />
-      </Router>
+      <App />
     </ConfigProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )

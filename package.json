@@ -4,9 +4,11 @@
   "description": "抖音桌面端应用",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "NODE_ENV=development electron .",
+    "start:win": "set NODE_ENV=development && electron .",
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "",
   "license": "MIT",

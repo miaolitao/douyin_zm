@@ -1,213 +1,313 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, Slider } from 'antd';
-import './VideoPlayer.css';
-import {
-  PlayCircleOutlined,
+import React, { useState, useRef, useEffect } from 'react'
+import { Button, Slider, Tooltip } from 'antd'
+import { 
+  PlayCircleOutlined, 
   PauseCircleOutlined,
   SoundOutlined,
-  HeartOutlined,
-  MessageOutlined,
-  ShareAltOutlined
-} from '@ant-design/icons';
+  AudioOutlined,
+  FullscreenOutlined,
+  SettingOutlined
+} from '@ant-design/icons'
 
 interface VideoPlayerProps {
-  videoUrl: string;
-  poster?: string;
+  src: string
+  poster?: string
+  onPlay?: () => void
+  onPause?: () => void
+  onEnded?: () => void
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, poster }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  src,
+  poster,
+  onPlay,
+  onPause,
+  onEnded
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const controlsTimeoutRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.load();
-      videoRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        // 自动播放可能被浏览器阻止，这里不需要处理错误
-        setIsPlaying(false);
-      });
+    const video = videoRef.current
+    if (!video) return
+
+    const handleLoadedMetadata = () => {
+      setDuration(video.duration)
     }
-  }, [videoUrl]);
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(video.currentTime)
+    }
+
+    const handleEnded = () => {
+      setIsPlaying(false)
+      onEnded?.()
+    }
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata)
+    video.addEventListener('timeupdate', handleTimeUpdate)
+    video.addEventListener('ended', handleEnded)
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      video.removeEventListener('timeupdate', handleTimeUpdate)
+      video.removeEventListener('ended', handleEnded)
+    }
+  }, [onEnded])
+
+  useEffect(() => {
+    if (showControls) {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false)
+      }, 3000)
+    }
+  }, [showControls])
 
   const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+    const video = videoRef.current
+    if (!video) return
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+    if (isPlaying) {
+      video.pause()
+      setIsPlaying(false)
+      onPause?.()
+    } else {
+      video.play()
+      setIsPlaying(true)
+      onPlay?.()
     }
-  };
+  }
 
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
+  const handleSeek = (value: number) => {
+    const video = videoRef.current
+    if (!video) return
+    video.currentTime = value
+    setCurrentTime(value)
+  }
 
   const handleVolumeChange = (value: number) => {
-    if (videoRef.current) {
-      videoRef.current.volume = value;
-      setVolume(value);
-    }
-  };
+    const video = videoRef.current
+    if (!video) return
+    video.volume = value
+    setVolume(value)
+    setIsMuted(value === 0)
+  }
 
-  const handleVideoEnd = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (!video) return
+    if (isMuted) {
+      video.volume = volume || 1
+      setIsMuted(false)
+    } else {
+      video.volume = 0
+      setIsMuted(true)
     }
-  };
+  }
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen()
+      setIsFullscreen(true)
+    } else {
+      document.exitFullscreen()
+      setIsFullscreen(false)
+    }
+  }
 
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
+  const handleMouseMove = () => {
+    setShowControls(true)
+  }
+
+  const handleMouseLeave = () => {
+    setShowControls(false)
+  }
 
   return (
-    <div className="video-player" style={{ 
-      position: 'relative', 
-      width: '100%', 
-      height: '100%', 
-      backgroundColor: '#000',
-      borderRadius: '8px',
-      overflow: 'hidden'
-    }}>
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#000',
+        borderRadius: '12px',
+        overflow: 'hidden'
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <video
         ref={videoRef}
-        src={videoUrl}
+        src={src}
         poster={poster}
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover',
-          borderRadius: '8px'
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover'
         }}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleVideoEnd}
         onClick={togglePlay}
-        loop
       />
-      
-      <div className="controls" style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: '16px 20px',
-        background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        opacity: 0,
-        transition: 'opacity 0.3s ease',
-        ':hover': { opacity: 1 }
-      }}>
-        <Button
-          type="text"
-          icon={isPlaying ? <PauseCircleOutlined style={{ fontSize: '28px', color: '#fff' }} /> : <PlayCircleOutlined style={{ fontSize: '28px', color: '#fff' }} />}
+
+      {/* 播放按钮覆盖层 */}
+      {!isPlaying && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            cursor: 'pointer'
+          }}
           onClick={togglePlay}
-          style={{ padding: '4px' }}
-        />
-        
-        <div style={{ flex: 1, padding: '0 8px' }}>
-          <Slider
-            value={currentTime}
-            max={duration}
-            onChange={(value) => {
-              if (videoRef.current) {
-                videoRef.current.currentTime = value;
-              }
+        >
+          <PlayCircleOutlined
+            style={{
+              fontSize: '80px',
+              color: 'rgba(255, 255, 255, 0.9)',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
             }}
-            tooltip={{ formatter: formatTime }}
-            style={{ margin: 0 }}
           />
         </div>
-        
-        <span style={{ color: '#fff', fontSize: '14px', fontFamily: 'system-ui' }}>
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </span>
-        
-        <div style={{ position: 'relative' }}>
-          <Button
-            type="text"
-            icon={<SoundOutlined style={{ fontSize: '24px', color: '#fff' }} />}
-            onMouseEnter={() => setShowVolumeSlider(true)}
-            onMouseLeave={() => setShowVolumeSlider(false)}
-            style={{ padding: '4px' }}
-          />
-          {showVolumeSlider && (
-            <div style={{
-              position: 'absolute',
-              bottom: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '36px',
-              height: '120px',
-              padding: '16px 0',
-              background: 'rgba(0,0,0,0.85)',
-              borderRadius: '8px',
-              marginBottom: '8px'
-            }}>
+      )}
+
+      {/* 控制栏 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.8))',
+          padding: '20px',
+          opacity: showControls ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+          pointerEvents: showControls ? 'auto' : 'none'
+        }}
+      >
+        {/* 进度条 */}
+        <Slider
+          value={currentTime}
+          max={duration}
+          onChange={handleSeek}
+          tooltip={{
+            formatter: (value) => formatTime(value || 0)
+          }}
+          style={{
+            marginBottom: '16px'
+          }}
+          trackStyle={{ backgroundColor: '#ff0050' }}
+          handleStyle={{ borderColor: '#ff0050' }}
+          railStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+        />
+
+        {/* 控制按钮 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* 播放/暂停 */}
+            <Button
+              type="text"
+              icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+              onClick={togglePlay}
+              style={{
+                color: '#fff',
+                fontSize: '24px',
+                padding: 0,
+                width: 'auto',
+                height: 'auto'
+              }}
+            />
+
+            {/* 音量控制 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Button
+                type="text"
+                icon={isMuted ? <AudioOutlined /> : <SoundOutlined />}
+                onClick={toggleMute}
+                style={{
+                  color: '#fff',
+                  fontSize: '20px',
+                  padding: 0,
+                  width: 'auto',
+                  height: 'auto'
+                }}
+              />
               <Slider
-                vertical
-                value={volume}
+                value={isMuted ? 0 : volume}
                 min={0}
                 max={1}
                 step={0.1}
                 onChange={handleVolumeChange}
-                style={{ margin: 0 }}
+                style={{
+                  width: '80px',
+                  margin: 0
+                }}
+                trackStyle={{ backgroundColor: '#ff0050' }}
+                handleStyle={{ borderColor: '#ff0050' }}
+                railStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
               />
             </div>
-          )}
-        </div>
-      </div>
 
-      <div className="interaction-buttons" style={{
-        position: 'absolute',
-        right: '20px',
-        bottom: '100px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        alignItems: 'center'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <Button
-            type="text"
-            icon={<HeartOutlined style={{ fontSize: '28px', color: isLiked ? '#fe2c55' : '#fff' }} />}
-            onClick={() => setIsLiked(!isLiked)}
-            style={{ color: '#fff' }}
-          />
-          <div style={{ color: '#fff', fontSize: '14px', marginTop: '4px', fontWeight: 600 }}>123.4k</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <Button type="text" icon={<MessageOutlined style={{ fontSize: '28px', color: '#fff' }} />} style={{ color: '#fff' }} />
-          <div style={{ color: '#fff', fontSize: '14px', marginTop: '4px', fontWeight: 600 }}>2.1k</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <Button type="text" icon={<ShareAltOutlined style={{ fontSize: '28px', color: '#fff' }} />} style={{ color: '#fff' }} />
-          <div style={{ color: '#fff', fontSize: '14px', marginTop: '4px', fontWeight: 600 }}>分享</div>
+            {/* 时间显示 */}
+            <span style={{ color: '#fff', fontSize: '14px' }}>
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* 设置 */}
+            <Tooltip title="设置">
+              <Button
+                type="text"
+                icon={<SettingOutlined />}
+                style={{
+                  color: '#fff',
+                  fontSize: '18px',
+                  padding: 0,
+                  width: 'auto',
+                  height: 'auto'
+                }}
+              />
+            </Tooltip>
+
+            {/* 全屏 */}
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏'}>
+              <Button
+                type="text"
+                icon={<FullscreenOutlined />}
+                onClick={toggleFullscreen}
+                style={{
+                  color: '#fff',
+                  fontSize: '18px',
+                  padding: 0,
+                  width: 'auto',
+                  height: 'auto'
+                }}
+              />
+            </Tooltip>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default VideoPlayer;
+export default VideoPlayer
