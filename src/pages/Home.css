@@ -1,155 +1,220 @@
-/* 抖音首页样式 */
-.douyin-home-layout {
+/* 抖音首页样式 - 完全基于官网结构 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: #000000;
-  height: 100vh;
-  overflow: hidden;
+  color: #ffffff;
 }
 
-.douyin-content {
-  height: 100%;
-  overflow: hidden;
+/* 主容器 */
+.douyin-home-container {
+  min-height: 100vh;
+  background-color: #000000;
 }
 
-/* 视频容器 */
-.video-container {
-  padding: 24px;
-  height: 100%;
+/* 抖音官网风格的分类标签栏 */
+.discover-tab-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 20px;
+}
+
+.discover-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.discover-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.discover-tab {
+  position: relative;
+  padding: 16px 24px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.discover-tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.discover-tab.active {
+  color: #ffffff;
+  font-weight: 600;
+  border-bottom-color: #ff0050;
+}
+
+/* 主内容区域 */
+.parent-route-container {
+  padding: 20px;
+}
+
+.route-scroll-container {
+  height: calc(100vh - 120px);
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.video-container::-webkit-scrollbar {
+.route-scroll-container::-webkit-scrollbar {
   display: none;
 }
 
-/* 分类标签 */
-.category-tabs {
-  margin-bottom: 32px;
+/* 视频瀑布流 */
+.waterfall-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
 }
 
-.category-tabs-component {
-  margin-bottom: 24px;
-}
-
-.category-tabs-component .ant-tabs-tab {
+/* 视频卡片 - 完全按照抖音的样式 */
+.discover-video-card-item {
   background-color: transparent;
-  border: none;
-}
-
-.category-tabs-component .ant-tabs-tab-active {
-  background-color: rgba(255, 0, 80, 0.1);
-}
-
-.category-tabs-component .ant-tabs-tab-btn {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
-}
-
-.category-tabs-component .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.category-tabs-component .ant-tabs-ink-bar {
-  background: linear-gradient(90deg, #ff0050, #ff6b9d);
-  height: 3px;
-  border-radius: 2px;
-}
-
-.category-tab-label {
-  color: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-}
-
-/* 视频网格 */
-.video-grid {
-  margin-bottom: 24px;
-}
-
-/* 视频卡片 */
-.video-card {
-  background-color: #000000;
-  border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  transition: all 0.3s ease;
   cursor: pointer;
-}
-
-.video-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(255, 0, 80, 0.3);
-}
-
-.video-card .ant-card-body {
-  padding: 16px;
-  background-color: #000000;
-  border: none;
-}
-
-/* 视频封面 */
-.video-cover {
+  transition: all 0.3s ease;
   position: relative;
-  padding-top: 133%;
-  overflow: hidden;
-  background-color: #000000;
 }
 
-.video-poster {
+.discover-video-card-item:hover {
+  transform: translateY(-4px);
+}
+
+.waterfall-videoCardContainer {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 视频图片容器 */
+.videoImage {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 比例 */
+  background-color: #000000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.videoImageInner {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.videoImageContent {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 视频封面图片 */
+.discover-video-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.video-cover:hover .video-poster {
+.discover-video-card-item:hover .discover-video-card-img {
   transform: scale(1.05);
 }
 
-.play-icon {
+/* 播放按钮 */
+.playButton {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 48px;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  width: 44px;
+  height: 44px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
-.video-duration {
+.discover-video-card-item:hover .playButton {
+  opacity: 1;
+}
+
+.playButton svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* 视频时长 */
+.videoDuration {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   background-color: rgba(0, 0, 0, 0.7);
   color: #ffffff;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
-  z-index: 2;
+  backdrop-filter: blur(4px);
 }
 
-/* 视频信息 */
-.video-info {
-  margin-bottom: 16px;
+/* 点赞数 */
+.likeCount {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
 }
 
-.video-title {
+.likeIcon {
+  color: #ff0050;
+  font-size: 14px;
+}
+
+/* 视频信息区域 */
+.videoInfo {
+  padding: 12px 0;
+}
+
+.videoTitle {
   color: #ffffff;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -157,157 +222,48 @@
   text-overflow: ellipsis;
 }
 
-/* 视频标签 */
-.video-tags {
-  margin-bottom: 12px;
-}
-
-.video-tag {
-  background-color: rgba(255, 0, 80, 0.2);
-  border: 1px solid rgba(255, 0, 80, 0.3);
-  color: #ff0050;
-  border-radius: 12px;
-  font-size: 11px;
-  padding: 2px 8px;
-  margin: 0;
-}
-
-.video-tag:hover {
-  background-color: rgba(255, 0, 80, 0.3);
-  border-color: rgba(255, 0, 80, 0.5);
-}
-
-/* 作者信息 */
-.author-info {
+.videoMeta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
 }
 
-.author-details {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.author-avatar {
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.author-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.author-name {
+.authorInfo {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.author-name span {
-  color: #ffffff;
   font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.authorPrefix {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.authorName {
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
 }
 
-.verified-badge {
-  background-color: #ff0050;
+.publishTime {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.author-followers {
-  color: #888;
-  font-size: 11px;
-}
-
-/* 关注按钮 */
-.follow-button {
-  width: 28px;
-  height: 28px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 14px;
-  color: #fff;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.follow-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.follow-button.followed {
-  background-color: #ff0050;
-}
-
-/* 互动按钮 */
-.interaction-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.left-buttons {
-  display: flex;
-  gap: 16px;
-}
-
-.interaction-button {
-  color: #fff;
-  padding: 4px 8px;
-  height: auto;
+.videoStats {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: transparent;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.interaction-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-.interaction-button span {
+  color: rgba(255, 255, 255, 0.7);
   font-size: 12px;
 }
 
-.like-button:hover {
-  color: #ff0050;
+.videoStats svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
 }
 
-.comment-button:hover {
-  color: #ff6b9d;
-}
 
-.share-button:hover {
-  color: #ffd700;
-}
-
-.more-button {
-  width: 24px;
-  height: 24px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 12px;
-  color: #888;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.more-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-}
 
 /* 加载状态 */
 .loading-container {
@@ -326,7 +282,7 @@
 }
 
 .loading-text {
-  color: #888;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
 }
 
@@ -336,36 +292,88 @@
 }
 
 /* 响应式设计 */
+@media (max-width: 1200px) {
+  .waterfall-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+}
+
 @media (max-width: 768px) {
-  .video-container {
+  .discover-tab {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .parent-route-container {
     padding: 16px;
   }
   
-  .category-tabs-component .ant-tabs-tab-btn {
-    font-size: 14px;
-    padding: 6px 12px;
+  .waterfall-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .waterfall-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
-  .video-grid .ant-col {
-    margin-bottom: 16px;
+  .discover-tab {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 }
 
 /* 滚动条样式 */
-.video-container::-webkit-scrollbar {
+.route-scroll-container::-webkit-scrollbar {
   width: 6px;
 }
 
-.video-container::-webkit-scrollbar-track {
+.route-scroll-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
-.video-container::-webkit-scrollbar-thumb {
+.route-scroll-container::-webkit-scrollbar-thumb {
   background: rgba(255, 0, 80, 0.6);
   border-radius: 3px;
 }
 
-.video-container::-webkit-scrollbar-thumb:hover {
+.route-scroll-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 0, 80, 0.8);
+}
+
+/* 悬停效果增强 */
+.discover-video-card-item:hover {
+  box-shadow: 0 8px 24px rgba(255, 0, 80, 0.3);
+}
+
+/* 焦点状态 */
+.discover-video-card-item:focus {
+  outline: 2px solid #ff0050;
+  outline-offset: 2px;
+}
+
+/* 加载状态动画 */
+.loading-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.discover-video-card-item {
+  animation: fadeInUp 0.6s ease-out;
 }
