@@ -1,7 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { 
+  Layout, 
+  Tabs, 
+  Card, 
+  Avatar, 
+  Button, 
+  Row, 
+  Col, 
+  Space, 
+  Tag, 
+  Badge,
+  message
+} from 'antd'
+import {
+  HeartOutlined,
+  HeartFilled,
+  MessageOutlined,
+  ShareAltOutlined,
+  PlayCircleOutlined,
+  UserOutlined,
+  VerifiedOutlined,
+  UserAddOutlined,
+  MoreOutlined
+} from '@ant-design/icons'
 import { sampleVideos, categories } from '../data/videos'
 import './Home.css'
+
+const { Content } = Layout
 
 const Home: React.FC = () => {
   const navigate = useNavigate()
@@ -62,110 +88,150 @@ const Home: React.FC = () => {
     }
   }, [loading, currentCategory])
 
-  // 格式化数字
-  const formatNumber = (num: number): string => {
-    if (num >= 10000) {
-      return (num / 10000).toFixed(1) + '万'
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'k'
-    }
-    return num.toString()
-  }
-
   return (
-    <div className="douyin-home-container">
-      {/* 顶部导航栏 */}
-      <div className="douyin-top-nav">
-        <div className="nav-tabs">
-          {['精选', '推荐', 'AI抖音', '关注', '朋友', '我的'].map(tab => (
-            <div
-              key={tab}
-              className={`nav-tab ${currentCategory === tab ? 'active' : ''}`}
-              onClick={() => handleCategoryChange(tab)}
-            >
-              {tab}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 主内容区域 */}
-      <div className="douyin-main-content">
-        {/* 左侧视频流 */}
-        <div className="video-stream-container" ref={containerRef}>
+    <Layout className="douyin-home-layout">
+      <Content className="douyin-content">
+        <div
+          ref={containerRef}
+          className="video-container"
+        >
           {/* 分类标签 */}
           <div className="category-tabs">
-            {categories.map(category => (
-              <div
-                key={category}
-                className={`category-tab ${currentCategory === category ? 'active' : ''}`}
-                onClick={() => handleCategoryChange(category)}
-              >
-                {category}
-              </div>
-            ))}
+            <Tabs
+              activeKey={currentCategory}
+              onChange={handleCategoryChange}
+              items={categories.map(category => ({
+                key: category,
+                label: (
+                  <span className="category-tab-label">
+                    {category}
+                  </span>
+                ),
+              }))}
+              className="category-tabs-component"
+            />
           </div>
 
           {/* 视频网格 */}
-          <div className="video-grid">
+          <Row gutter={[24, 24]} className="video-grid">
             {displayedVideos.map(video => (
-              <div key={video.id} className="discover-video-card-item" data-aweme-id={video.id}>
-                <div className="waterfall-videoCardContainer jingxuanVideoCard" onClick={() => navigate(`/video/${video.id}`)}>
-                  {/* 视频封面区域 */}
-                  <div className="videoImage">
-                    <div className="videoImageInner">
-                      <div className="videoImageContent">
-                        <img 
-                          src={video.poster} 
-                          alt={video.title} 
-                          className="discover-video-card-img"
-                          loading="lazy"
-                        />
-                        
-                        {/* 播放按钮 */}
-                        <div className="playButton">
-                          <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 23">
-                            <path d="M15.583 11.5a1.833 1.833 0 1 1 3.667 0 1.833 1.833 0 0 1-3.667 0zM9.167 11.5a1.833 1.833 0 1 1 3.666 0 1.833 1.833 0 0 1-3.666 0zM4.583 9.667a1.833 1.833 0 1 0 0 3.666 1.833 1.833 0 0 0 0-3.666z" fill="#fff"/>
-                          </svg>
-                        </div>
-                        
-                        {/* 视频时长 */}
-                        <div className="videoDuration">
-                          {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
-                        </div>
-                        
-                        {/* 点赞数 */}
-                        <div className="likeCount">
-                          <span className="likeIcon">❤</span>
-                          <span>{formatNumber(video.likes)}</span>
-                        </div>
+              <Col key={video.id} xs={24} sm={12} md={8} lg={6} xl={4}>
+                <Card
+                  hoverable
+                  onClick={() => navigate(`/video/${video.id}`)}
+                  cover={
+                    <div className="video-cover">
+                      <img
+                        alt={video.title}
+                        src={video.poster}
+                        className="video-poster"
+                      />
+                      <PlayCircleOutlined className="play-icon" />
+                      <div className="video-duration">
+                        {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
                       </div>
                     </div>
-                  </div>
-
-                  {/* 视频信息区域 */}
-                  <div className="videoInfo">
-                    <div className="videoTitle">
+                  }
+                  className="video-card"
+                >
+                  {/* 视频信息 */}
+                  <div className="video-info">
+                    <div className="video-title">
                       {video.title}
                     </div>
-                    <div className="videoMeta">
-                      <div className="authorInfo">
-                        <span className="authorPrefix">@</span>
-                        <span className="authorName">{video.author.name}</span>
-                        <span className="publishTime"> · {video.createdAt}</span>
-                      </div>
-                      <div className="videoStats">
-                        <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 23">
-                          <path d="M15.583 11.5a1.833 1.833 0 1 1 3.667 0 1.833 1.833 0 0 1-3.667 0zM9.167 11.5a1.833 1.833 0 1 1 3.666 0 1.833 1.833 0 0 1-3.666 0zM4.583 9.667a1.833 1.833 0 1 0 0 3.666 1.833 1.833 0 0 0 0-3.666z" fill="#fff"/>
-                        </svg>
+                    
+                    {/* 标签 */}
+                    {video.hashtags && video.hashtags.length > 0 && (
+                      <Space size={[0, 8]} wrap className="video-tags">
+                        {video.hashtags.slice(0, 2).map((tag, index) => (
+                          <Tag 
+                            key={index}
+                            className="video-tag"
+                          >
+                            #{tag}
+                          </Tag>
+                        ))}
+                      </Space>
+                    )}
+                  </div>
+
+                  {/* 作者信息 */}
+                  <div className="author-info">
+                    <div className="author-details">
+                      <Avatar 
+                        src={video.author.avatar} 
+                        size={28}
+                        className="author-avatar"
+                      />
+                      <div className="author-text">
+                        <div className="author-name">
+                          <span>{video.author.name}</span>
+                          {video.author.verified && (
+                            <Badge 
+                              count={<VerifiedOutlined style={{ fontSize: '8px', color: '#fff' }} />}
+                              className="verified-badge"
+                            />
+                          )}
+                        </div>
+                        <div className="author-followers">
+                          {(video.author.followers / 10000).toFixed(1)}万粉丝
+                        </div>
                       </div>
                     </div>
+                    <Button
+                      type="text"
+                      icon={video.isFollowed ? <VerifiedOutlined /> : <UserAddOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFollow(video.id)
+                      }}
+                      className={`follow-button ${video.isFollowed ? 'followed' : ''}`}
+                    />
                   </div>
-                </div>
-              </div>
+
+                  {/* 互动按钮 */}
+                  <div className="interaction-buttons">
+                    <div className="left-buttons">
+                      <Button
+                        type="text"
+                        icon={
+                          video.isLiked ? 
+                          <HeartFilled style={{ color: '#ff0050' }} /> : 
+                          <HeartOutlined style={{ color: '#fff' }} />
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleLike(video.id)
+                        }}
+                        className="interaction-button like-button"
+                      >
+                        <span>{(video.likes / 1000).toFixed(1)}k</span>
+                      </Button>
+                      <Button
+                        type="text"
+                        icon={<MessageOutlined style={{ color: '#fff' }} />}
+                        className="interaction-button comment-button"
+                      >
+                        <span>{(video.comments / 1000).toFixed(1)}k</span>
+                      </Button>
+                      <Button
+                        type="text"
+                        icon={<ShareAltOutlined style={{ color: '#fff' }} />}
+                        className="interaction-button share-button"
+                      >
+                        <span>{(video.shares / 1000).toFixed(1)}k</span>
+                      </Button>
+                    </div>
+                    <Button
+                      type="text"
+                      icon={<MoreOutlined style={{ color: '#888' }} />}
+                      className="more-button"
+                    />
+                  </div>
+                </Card>
+              </Col>
             ))}
-          </div>
+          </Row>
 
           {/* 加载状态 */}
           {loading && (
@@ -175,19 +241,8 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* 右侧分类导航 */}
-        <div className="category-sidebar">
-          <div className="category-title">分类</div>
-          {categories.slice(5).map(category => (
-            <div key={category} className="category-item">
-              <span className="category-icon">🎯</span>
-              <span className="category-name">{category}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      </Content>
+    </Layout>
   )
 }
 
