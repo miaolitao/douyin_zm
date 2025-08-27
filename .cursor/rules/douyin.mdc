@@ -1,0 +1,6 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+使用playwright截图保存到 ./screenshots下面
