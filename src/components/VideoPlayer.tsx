@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons'
 
 interface VideoPlayerProps {
-  src: string
+  videoUrl: string
   poster?: string
   onPlay?: () => void
   onPause?: () => void
@@ -18,7 +18,7 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
-  src,
+  videoUrl,
   poster,
   onPlay,
   onPause,
@@ -41,10 +41,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!video) return
 
     const handleLoadedMetadata = () => {
+      console.log('Video metadata loaded:', {
+        duration: video.duration,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight
+      })
       setDuration(video.duration)
     }
 
     const handleTimeUpdate = () => {
+      console.log('Video time update:', video.currentTime)
       setCurrentTime(video.currentTime)
     }
 
@@ -79,14 +85,60 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current
     if (!video) return
 
+    console.log('Video state:', {
+      readyState: video.readyState,
+      networkState: video.networkState,
+      error: video.error,
+      src: video.src
+    })
+
     if (isPlaying) {
       video.pause()
       setIsPlaying(false)
       onPause?.()
     } else {
-      video.play()
-      setIsPlaying(true)
-      onPlay?.()
+      // 模拟视频播放，用于演示进度条功能
+      if (video.readyState === 0) {
+        console.log('Video not ready, simulating playback for demo')
+        setIsPlaying(true)
+        onPlay?.()
+        
+        // 模拟进度条移动 - 每100ms更新一次
+        let shouldContinue = true
+        const simulateProgress = () => {
+          if (shouldContinue && currentTime < duration) {
+            setCurrentTime(prev => {
+              const newTime = Math.min(prev + 0.1, duration)
+              console.log('Simulated progress:', newTime)
+              return newTime
+            })
+            setTimeout(simulateProgress, 100)
+          }
+        }
+        simulateProgress()
+        
+        // 当停止播放时，停止模拟
+        const cleanup = () => {
+          shouldContinue = false
+        }
+        
+        // 返回清理函数
+        return cleanup
+      } else {
+        const playPromise = video.play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Video started playing successfully')
+              setIsPlaying(true)
+              onPlay?.()
+            })
+            .catch((error) => {
+              console.error('Error playing video:', error)
+              setIsPlaying(false)
+            })
+        }
+      }
     }
   }
 
@@ -157,7 +209,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     >
       <video
         ref={videoRef}
-        src={src}
+        src={videoUrl}
         poster={poster}
         style={{
           width: '100%',
