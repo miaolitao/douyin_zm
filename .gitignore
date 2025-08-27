@@ -37,4 +37,4 @@ yarn-error.log*
 out/
 
 #使用playwright截图保存到 ./screenshots下面
-.screenshots/
+screenshots/
