@@ -9,6 +9,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const [currentCategory, setCurrentCategory] = useState('全部')
   const [currentPage, setCurrentPage] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const pageSize = 12
 
@@ -51,16 +52,20 @@ const Home: React.FC = () => {
   }
 
   const handleScroll = () => {
-    if (!containerRef.current || loading) return
+    if (!containerRef.current || loading || loadingMore) return
 
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+    // 当滚动到距离底部100px时开始加载
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      if (currentPage * pageSize < filteredVideos.length) {
-        setLoading(true)
+      const hasMore = currentPage * pageSize < filteredVideos.length
+      if (hasMore) {
+        setLoadingMore(true)
+        // 模拟网络延迟
         setTimeout(() => {
           setCurrentPage(prev => prev + 1)
-          setLoading(false)
-        }, 500)
+          setLoadingMore(false)
+          console.log(`加载更多视频，当前页: ${currentPage + 1}，总视频数: ${filteredVideos.length}`)
+        }, 800)
       }
     }
   }
@@ -71,7 +76,7 @@ const Home: React.FC = () => {
       container.addEventListener('scroll', handleScroll)
       return () => container.removeEventListener('scroll', handleScroll)
     }
-  }, [loading, currentCategory])
+  }, [loading, loadingMore, currentCategory, currentPage, filteredVideos.length])
 
   // 格式化数字
   const formatNumber = (num: number): string => {
@@ -171,6 +176,23 @@ const Home: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* 加载更多提示 */}
+        {loadingMore && (
+          <div className="load-more-container">
+            <div className="load-more-spinner">
+              <div className="spinner"></div>
+              <span>加载更多视频...</span>
+            </div>
+          </div>
+        )}
+
+        {/* 没有更多数据提示 */}
+        {!loadingMore && displayedVideos.length >= filteredVideos.length && filteredVideos.length > 0 && (
+          <div className="no-more-container">
+            <span>已显示全部 {filteredVideos.length} 个视频</span>
+          </div>
+        )}
 
       </div>
       </LoadingState>

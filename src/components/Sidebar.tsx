@@ -27,22 +27,22 @@ const Sidebar: React.FC = () => {
     {
       key: '/',
       icon: <HomeOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>首页</span>
+      label: <Link to="/" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>首页</Link>
     },
     {
       key: '/featured',
       icon: <FireOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>热门</span>
+      label: <Link to="/featured" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>热门</Link>
     },
     {
       key: '/follow',
       icon: <HeartOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>关注</span>
+      label: <Link to="/follow" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>关注</Link>
     },
     {
       key: '/friend',
       icon: <UserOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <span style={{ fontSize: '16px', fontWeight: 500, color: '#fff' }}>朋友</span>
+      label: <Link to="/friend" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>朋友</Link>
     },
     { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.1)', margin: '16px 0' } },
     {

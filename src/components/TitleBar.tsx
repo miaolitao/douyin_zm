@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Layout, Button, Input, Avatar, Badge } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { 
   SearchOutlined, 
   BellOutlined, 
@@ -15,6 +16,11 @@ const { Header } = Layout
 
 const TitleBar: React.FC = () => {
   const [searchModalVisible, setSearchModalVisible] = useState(false)
+  const navigate = useNavigate()
+
+  const handleLogoClick = () => {
+    navigate('/')
+  }
 
   return (
     <>
@@ -33,7 +39,25 @@ const TitleBar: React.FC = () => {
         {/* 左侧Logo和搜索 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              cursor: 'pointer',
+              WebkitAppRegion: 'no-drag',
+              padding: '4px 8px',
+              borderRadius: '8px',
+              transition: 'background-color 0.2s ease'
+            }}
+            onClick={handleLogoClick}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
             <div style={{
               width: '32px',
               height: '32px',
@@ -44,7 +68,8 @@ const TitleBar: React.FC = () => {
               justifyContent: 'center',
               color: '#fff',
               fontSize: '18px',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              transition: 'transform 0.2s ease'
             }}>
               抖
             </div>
@@ -52,7 +77,8 @@ const TitleBar: React.FC = () => {
               color: '#fff', 
               fontSize: '20px', 
               fontWeight: 'bold',
-              marginLeft: '8px'
+              marginLeft: '8px',
+              transition: 'color 0.2s ease'
             }}>
               抖音
             </span>

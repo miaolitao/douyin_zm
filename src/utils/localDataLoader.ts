@@ -67,10 +67,22 @@ export class LocalDataLoader {
       }
       
       this.videosData = data
-      this.processedVideos = this.videosData.map(rawData => this.transformToVideo(rawData))
+      
+      // 处理数据并去除重复项
+      const processedVideos = this.videosData.map(rawData => this.transformToVideo(rawData))
+      
+      // 使用Map去除重复的视频ID
+      const uniqueVideosMap = new Map()
+      processedVideos.forEach(video => {
+        if (!uniqueVideosMap.has(video.id)) {
+          uniqueVideosMap.set(video.id, video)
+        }
+      })
+      
+      this.processedVideos = Array.from(uniqueVideosMap.values())
       this.isLoaded = true
       
-      console.log('本地数据加载成功:', this.videosData.length, '个视频')
+      console.log('本地数据加载成功:', this.videosData.length, '个原始视频，去重后:', this.processedVideos.length, '个视频')
     } catch (error) {
       console.error('加载本地数据失败:', error)
       this.videosData = []
