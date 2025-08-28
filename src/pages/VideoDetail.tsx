@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Layout, Card, Avatar, Button, Input, List } from 'antd';
 import { Comment } from '@ant-design/compatible';
 import { HeartOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
 import VideoPlayer from '../components/VideoPlayer';
-import { sampleVideos } from '../data/videos';
+import { localDataLoader } from '../utils/localDataLoader';
+import { Video } from '../types/video';
 
 const { Content } = Layout;
 
@@ -34,10 +35,34 @@ const sampleComments = [
 
 const VideoDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const video = sampleVideos.find(v => v.id === id);
+  const [video, setVideo] = useState<Video | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadVideo = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const videoData = await localDataLoader.getVideoById(id);
+        setVideo(videoData);
+      } catch (error) {
+        console.error('Failed to load video:', error);
+        setVideo(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVideo();
+  }, [id]);
+
+  if (loading) {
+    return <div style={{ color: 'white', textAlign: 'center', padding: '50px' }}>加载中...</div>;
+  }
 
   if (!video) {
-    return <div>视频不存在</div>;
+    return <div style={{ color: 'white', textAlign: 'center', padding: '50px' }}>视频不存在</div>;
   }
 
   return (
@@ -49,7 +74,11 @@ const VideoDetail: React.FC = () => {
             bodyStyle={{ padding: 0 }}
           >
             <div style={{ height: '600px' }}>
-              <VideoPlayer videoUrl={video.videoUrl} poster={video.poster} />
+              <VideoPlayer 
+                videoUrl={video.videoUrl} 
+                poster={video.poster} 
+                isLocal={video.isLocal}
+              />
             </div>
           </Card>
           

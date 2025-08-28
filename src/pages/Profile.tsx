@@ -10,16 +10,35 @@ import {
   UserAddOutlined,
   CheckOutlined
 } from '@ant-design/icons'
-import { currentUser, sampleVideos } from '../data/videos'
+import { currentUser } from '../data/videos'
+import { localDataLoader } from '../utils/localDataLoader'
+import { Video } from '../types/video'
 
 const { Content } = Layout
 
 const Profile: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false)
   const [activeTab, setActiveTab] = useState('videos')
+  const [allVideos, setAllVideos] = useState<Video[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const userVideos = sampleVideos.filter(video => video.author.id === 'current_user')
-  const likedVideos = sampleVideos.filter(video => video.isLiked)
+  // 加载视频数据
+  React.useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        const videos = await localDataLoader.getVideos()
+        setAllVideos(videos)
+      } catch (error) {
+        console.error('Failed to load videos for profile:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadVideos()
+  }, [])
+
+  const userVideos = allVideos.filter(video => video.author.id === 'current_user')
+  const likedVideos = allVideos.filter(video => video.isLiked)
 
   return (
     <Layout style={{ backgroundColor: '#000000', height: '100%', overflow: 'auto' }}>

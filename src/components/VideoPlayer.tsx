@@ -12,6 +12,7 @@ import {
 interface VideoPlayerProps {
   videoUrl: string
   poster?: string
+  isLocal?: boolean // 标记是否为本地视频
   onPlay?: () => void
   onPause?: () => void
   onEnded?: () => void
@@ -20,6 +21,7 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoUrl,
   poster,
+  isLocal = false,
   onPlay,
   onPause,
   onEnded
@@ -89,7 +91,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       readyState: video.readyState,
       networkState: video.networkState,
       error: video.error,
-      src: video.src
+      src: video.src,
+      isLocal
     })
 
     if (isPlaying) {
@@ -97,8 +100,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       setIsPlaying(false)
       onPause?.()
     } else {
-      // 尝试播放真实抖音视频
-      if (videoUrl.includes('douyin.com')) {
+      // 本地视频直接播放
+      if (isLocal) {
+        console.log('Playing local video:', videoUrl)
+        const playPromise = video.play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Local video started playing successfully')
+              setIsPlaying(true)
+              onPlay?.()
+            })
+            .catch((error) => {
+              console.error('Error playing local video:', error)
+              setIsPlaying(false)
+            })
+        }
+      } else if (videoUrl.includes('douyin.com')) {
         console.log('Attempting to play Douyin video with custom headers')
         
         // 创建带有抖音请求头的视频请求

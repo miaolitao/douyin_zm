@@ -1,16 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { sampleVideos, categories } from '../data/videos'
+import { categories } from '../data/videos'
+import { localDataLoader } from '../utils/localDataLoader'
+import { Video } from '../types/video'
 import './Home.css'
 
 const Home: React.FC = () => {
   const navigate = useNavigate()
   const [currentCategory, setCurrentCategory] = useState('全部')
   const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(false)
-  const [videoList, setVideoList] = useState(sampleVideos)
+  const [loading, setLoading] = useState(true)
+  const [videoList, setVideoList] = useState<Video[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const pageSize = 12
+
+  // 加载本地数据
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        const videos = await localDataLoader.getVideos()
+        console.log('Loaded videos from local data:', videos.length)
+        setVideoList(videos)
+      } catch (error) {
+        console.error('Failed to load local data:', error)
+        setVideoList([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadData()
+  }, [])
 
   const filteredVideos = currentCategory === '全部'
     ? videoList

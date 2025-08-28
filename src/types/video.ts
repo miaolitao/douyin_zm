@@ -31,6 +31,7 @@ export interface Video {
   }
   location?: string
   hashtags: string[]
+  isLocal?: boolean // 标记是否为本地视频
 }
 
 export interface VideoData {
