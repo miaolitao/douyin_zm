@@ -1,43 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { categories } from '../data/videos'
-import { localDataLoader } from '../utils/localDataLoader'
-import { Video } from '../types/video'
+import { useVideoData } from '../hooks/useVideoData'
+import LoadingState from '../components/LoadingState'
 import './Home.css'
 
 const Home: React.FC = () => {
   const navigate = useNavigate()
   const [currentCategory, setCurrentCategory] = useState('全部')
   const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [videoList, setVideoList] = useState<Video[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const pageSize = 12
 
-  // 加载本地数据
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      try {
-        const videos = await localDataLoader.getVideos()
-        console.log('Loaded videos from local data:', videos.length)
-        setVideoList(videos)
-      } catch (error) {
-        console.error('Failed to load local data:', error)
-        setVideoList([])
-      } finally {
-        setLoading(false)
-      }
-    }
-    
-    loadData()
-  }, [])
+  // 使用统一的视频数据Hook
+  const { videos, loading, error, refetch, updateVideo } = useVideoData()
 
-  const filteredVideos = currentCategory === '全部'
-    ? videoList
-    : videoList.filter(video => video.category === currentCategory)
+  // 使用useMemo优化过滤和分页逻辑
+  const filteredVideos = useMemo(() => {
+    return currentCategory === '全部'
+      ? videos
+      : videos.filter(video => video.category === currentCategory)
+  }, [videos, currentCategory])
 
-  const displayedVideos = filteredVideos.slice(0, currentPage * pageSize)
+  const displayedVideos = useMemo(() => {
+    return filteredVideos.slice(0, currentPage * pageSize)
+  }, [filteredVideos, currentPage, pageSize])
 
   const handleCategoryChange = (category: string) => {
     setCurrentCategory(category)
@@ -45,19 +32,22 @@ const Home: React.FC = () => {
   }
 
   const handleLike = (videoId: string) => {
-    setVideoList(prev => prev.map(video => 
-      video.id === videoId 
-        ? { ...video, isLiked: !video.isLiked, likes: video.isLiked ? video.likes - 1 : video.likes + 1 }
-        : video
-    ))
+    const video = videos.find(v => v.id === videoId)
+    if (video) {
+      updateVideo(videoId, {
+        isLiked: !video.isLiked,
+        likes: video.isLiked ? video.likes - 1 : video.likes + 1
+      })
+    }
   }
 
   const handleFollow = (videoId: string) => {
-    setVideoList(prev => prev.map(video => 
-      video.id === videoId 
-        ? { ...video, isFollowed: !video.isFollowed }
-        : video
-    ))
+    const video = videos.find(v => v.id === videoId)
+    if (video) {
+      updateVideo(videoId, {
+        isFollowed: !video.isFollowed
+      })
+    }
   }
 
   const handleScroll = () => {
@@ -112,7 +102,15 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* 主内容区域 */}
+      {/* 使用统一的加载状态组件 */}
+      <LoadingState
+        loading={loading}
+        error={error}
+        onRetry={refetch}
+        showEmpty={displayedVideos.length === 0}
+        emptyMessage="暂无视频数据"
+      >
+        {/* 主内容区域 */}
       <div className="parent-route-container route-scroll-container" ref={containerRef}>
         {/* 视频瀑布流 */}
         <div className="waterfall-container">
@@ -174,14 +172,8 @@ const Home: React.FC = () => {
           ))}
         </div>
 
-        {/* 加载状态 */}
-        {loading && (
-          <div className="loading-container">
-            <div className="loading-spinner" />
-            <span className="loading-text">加载中...</span>
-          </div>
-        )}
       </div>
+      </LoadingState>
     </div>
   )
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Modal, Input, List, Avatar, Tag, Button, Divider } from 'antd'
 import { SearchOutlined, FireOutlined, HistoryOutlined, CloseOutlined } from '@ant-design/icons'
 import { searchHistory, hotSearches } from '../data/videos'
-import { localDataLoader } from '../utils/localDataLoader'
+import { useVideoData } from '../hooks/useVideoData'
 import { Video } from '../types/video'
 
 interface SearchModalProps {
@@ -14,21 +14,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
   const [searchValue, setSearchValue] = useState('')
   const [searchResults, setSearchResults] = useState<Video[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [allVideos, setAllVideos] = useState<Video[]>([])
   const inputRef = useRef<any>(null)
 
-  // 加载所有视频数据
-  useEffect(() => {
-    const loadVideos = async () => {
-      try {
-        const videos = await localDataLoader.getVideos()
-        setAllVideos(videos)
-      } catch (error) {
-        console.error('Failed to load videos for search:', error)
-      }
-    }
-    loadVideos()
-  }, [])
+  // 使用统一的视频数据Hook
+  const { videos } = useVideoData()
 
   useEffect(() => {
     if (visible && inputRef.current) {
@@ -44,7 +33,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
       setIsSearching(true)
       // 模拟搜索延迟
       setTimeout(() => {
-        const results = allVideos.filter(video => 
+        const results = videos.filter(video => 
           video.title.toLowerCase().includes(value.toLowerCase()) ||
           video.author.name.toLowerCase().includes(value.toLowerCase()) ||
           video.tags.some(tag => tag.toLowerCase().includes(value.toLowerCase()))

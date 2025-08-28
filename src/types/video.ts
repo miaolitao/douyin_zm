@@ -34,18 +34,6 @@ export interface Video {
   isLocal?: boolean // 标记是否为本地视频
 }
 
-export interface VideoData {
-  id: string
-  url: string
-  poster: string
-  title: string
-  author: {
-    name: string
-    avatar: string
-  }
-  description: string
-  category: string
-  likes: number
-  comments: number
-  shares: number
-}
+// VideoData 接口已废弃，请使用 Video 接口
+// 保留此接口仅为向后兼容
+export interface VideoData extends Video {}

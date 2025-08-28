@@ -1,50 +1,37 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Layout, Tabs, Card, Avatar, Button, Row, Col } from 'antd';
 import { HeartOutlined, MessageOutlined, ShareAltOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import VideoPlayer from '../components/VideoPlayer';
-
-interface VideoData {
-  id: string;
-  url: string;
-  poster: string;
-  title: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  description: string;
-  category: string;
-  likes: number;
-  comments: number;
-  shares: number;
-}
-
-const categories = ['全部', '游戏', '二次元', '音乐', '美食', '知识', '体育'];
-
-const sampleVideos: VideoData[] = Array(20).fill(null).map((_, index) => ({
-  id: `${index + 1}`,
-  url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-  poster: `https://picsum.photos/600/${800 + index}`,
-  title: `精选视频 ${index + 1}`,
-  author: {
-    name: `创作者 ${index + 1}`,
-    avatar: `https://picsum.photos/100/${100 + index}`
-  },
-  description: `这是一个精选视频示例 ${index + 1}`,
-  category: categories[Math.floor(Math.random() * categories.length)],
-  likes: Math.floor(Math.random() * 10000),
-  comments: Math.floor(Math.random() * 1000),
-  shares: Math.floor(Math.random() * 500)
-}));
+import { useVideoData } from '../hooks/useVideoData';
+import LoadingState from '../components/LoadingState';
+import { categories } from '../data/videos';
 
 const Featured: React.FC = () => {
   const navigate = useNavigate();
   const [currentCategory, setCurrentCategory] = useState('全部');
-  const [videos, setVideos] = useState<VideoData[]>(sampleVideos.slice(0, 12));
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [displayCount, setDisplayCount] = useState(12);
   const observer = useRef<IntersectionObserver>();
+
+  // 使用统一的视频数据Hook
+  const { videos: allVideos, loading, error, refetch, updateVideo } = useVideoData()
+
+  // 过滤和分页逻辑
+  const filteredVideos = useMemo(() => {
+    const filtered = currentCategory === '全部'
+      ? allVideos
+      : allVideos.filter(video => video.category === currentCategory)
+    
+    return filtered.slice(0, displayCount)
+  }, [allVideos, currentCategory, displayCount])
+
+  const hasMore = useMemo(() => {
+    const totalFiltered = currentCategory === '全部'
+      ? allVideos.length
+      : allVideos.filter(video => video.category === currentCategory).length
+    
+    return displayCount < totalFiltered
+  }, [allVideos, currentCategory, displayCount])
   const lastVideoElementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
@@ -57,31 +44,16 @@ const Featured: React.FC = () => {
   }, [loading, hasMore]);
 
   const loadMoreVideos = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const currentLength = videos.length;
-      const newVideos = sampleVideos.slice(currentLength, currentLength + 12);
-      if (newVideos.length === 0) {
-        setHasMore(false);
-      } else {
-        setVideos(prev => [...prev, ...newVideos]);
-      }
-      setLoading(false);
-    }, 1000);
+    if (!hasMore) return;
+    setDisplayCount(prev => prev + 12);
   };
 
   const handleCategoryChange = (category: string) => {
     setCurrentCategory(category);
-    const filteredInitialVideos = category === '全部' 
-      ? sampleVideos.slice(0, 12)
-      : sampleVideos.filter(video => video.category === category).slice(0, 12);
-    setVideos(filteredInitialVideos);
-    setHasMore(true);
+    setDisplayCount(12); // 重置显示数量
   };
 
-  const filteredVideos = currentCategory === '全部'
-    ? videos
-    : videos.filter(video => video.category === currentCategory);
+
 
   return (
     <Layout style={{ backgroundColor: '#121212', height: '100%', overflow: 'hidden' }}>
@@ -95,8 +67,15 @@ const Featured: React.FC = () => {
           }))}
           style={{ marginBottom: '24px' }}
         />
-        <Row gutter={[16, 16]}>
-          {filteredVideos.map((video, index) => (
+        <LoadingState
+          loading={loading}
+          error={error}
+          onRetry={refetch}
+          showEmpty={filteredVideos.length === 0}
+          emptyMessage="暂无精选视频"
+        >
+          <Row gutter={[16, 16]}>
+            {filteredVideos.map((video, index) => (
             <Col
               key={video.id}
               xs={24}
@@ -150,12 +129,8 @@ const Featured: React.FC = () => {
               </Card>
             </Col>
           ))}
-        </Row>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '24px', color: '#fff' }}>
-            加载中...
-          </div>
-        )}
+          </Row>
+        </LoadingState>
       </div>
     </Layout>
   );

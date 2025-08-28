@@ -1,10 +1,30 @@
 import { Video, Author } from '../types/video'
 
+interface RawVideoData {
+  aweme_id: string
+  title: string
+  desc: string
+  create_time: number
+  user_id: string
+  nickname: string
+  avatar: string
+  liked_count: string
+  comment_count: string
+  share_count: string
+  cover_url: string
+  video_download_url: string
+  music_download_url: string
+  user_signature?: string
+  ip_location?: string
+}
+
 // 本地数据加载器
 export class LocalDataLoader {
   private static instance: LocalDataLoader
-  private videosData: any[] = []
+  private videosData: RawVideoData[] = []
+  private processedVideos: Video[] = []
   private isLoaded = false
+  private loadingPromise: Promise<void> | null = null
 
   private constructor() {}
 
@@ -17,17 +37,47 @@ export class LocalDataLoader {
 
   // 加载本地JSON数据
   public async loadLocalData(): Promise<void> {
+    // 如果已经加载，直接返回
     if (this.isLoaded) return
 
+    // 如果正在加载，等待加载完成
+    if (this.loadingPromise) {
+      return this.loadingPromise
+    }
+
+    // 开始加载
+    this.loadingPromise = this._loadData()
+    return this.loadingPromise
+  }
+
+  private async _loadData(): Promise<void> {
     try {
-      // 动态导入JSON数据
+      console.log('开始加载本地视频数据...')
+      
       const response = await fetch('/search_contents_2025-08-28.json')
-      this.videosData = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      
+      if (!Array.isArray(data)) {
+        throw new Error('数据格式错误：期望数组格式')
+      }
+      
+      this.videosData = data
+      this.processedVideos = this.videosData.map(rawData => this.transformToVideo(rawData))
       this.isLoaded = true
+      
       console.log('本地数据加载成功:', this.videosData.length, '个视频')
     } catch (error) {
       console.error('加载本地数据失败:', error)
       this.videosData = []
+      this.processedVideos = []
+      throw error
+    } finally {
+      this.loadingPromise = null
     }
   }
 
@@ -142,20 +192,37 @@ export class LocalDataLoader {
   // 获取所有视频数据
   public async getVideos(): Promise<Video[]> {
     await this.loadLocalData()
-    return this.videosData.map(rawData => this.transformToVideo(rawData))
+    return [...this.processedVideos] // 返回副本，避免外部修改
   }
 
   // 根据ID获取单个视频
   public async getVideoById(id: string): Promise<Video | null> {
     await this.loadLocalData()
-    const rawData = this.videosData.find(item => item.aweme_id === id)
-    return rawData ? this.transformToVideo(rawData) : null
+    return this.processedVideos.find(video => video.id === id) || null
   }
 
   // 获取本地视频列表（只返回有本地文件的视频）
   public async getLocalVideos(): Promise<Video[]> {
-    const allVideos = await this.getVideos()
-    return allVideos.filter(video => (video as any).isLocal)
+    await this.loadLocalData()
+    return this.processedVideos.filter(video => video.isLocal)
+  }
+
+  // 清除缓存，强制重新加载
+  public clearCache(): void {
+    this.videosData = []
+    this.processedVideos = []
+    this.isLoaded = false
+    this.loadingPromise = null
+    console.log('本地数据缓存已清除')
+  }
+
+  // 获取加载状态
+  public getLoadingStatus(): { isLoaded: boolean; isLoading: boolean; videoCount: number } {
+    return {
+      isLoaded: this.isLoaded,
+      isLoading: this.loadingPromise !== null,
+      videoCount: this.processedVideos.length
+    }
   }
 }
 

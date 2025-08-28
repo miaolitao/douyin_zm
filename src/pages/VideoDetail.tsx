@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Layout, Card, Avatar, Button, Input, List } from 'antd';
 import { Comment } from '@ant-design/compatible';
 import { HeartOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
 import VideoPlayer from '../components/VideoPlayer';
-import { localDataLoader } from '../utils/localDataLoader';
-import { Video } from '../types/video';
+import { useVideo } from '../hooks/useVideoData';
+import LoadingState from '../components/LoadingState';
 
 const { Content } = Layout;
 
@@ -35,52 +35,32 @@ const sampleComments = [
 
 const VideoDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [video, setVideo] = useState<Video | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadVideo = async () => {
-      if (!id) return;
-      
-      setLoading(true);
-      try {
-        const videoData = await localDataLoader.getVideoById(id);
-        setVideo(videoData);
-      } catch (error) {
-        console.error('Failed to load video:', error);
-        setVideo(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadVideo();
-  }, [id]);
-
-  if (loading) {
-    return <div style={{ color: 'white', textAlign: 'center', padding: '50px' }}>加载中...</div>;
-  }
-
-  if (!video) {
-    return <div style={{ color: 'white', textAlign: 'center', padding: '50px' }}>视频不存在</div>;
-  }
+  const { video, loading, error } = useVideo(id || '');
 
   return (
     <Layout style={{ height: '100%', backgroundColor: '#121212', padding: '24px' }}>
       <Content style={{ display: 'flex', gap: '24px' }}>
-        <div style={{ flex: '1 1 70%' }}>
-          <Card
-            style={{ backgroundColor: '#1d1d1d', marginBottom: '24px' }}
-            bodyStyle={{ padding: 0 }}
-          >
-            <div style={{ height: '600px' }}>
-              <VideoPlayer 
-                videoUrl={video.videoUrl} 
-                poster={video.poster} 
-                isLocal={video.isLocal}
-              />
-            </div>
-          </Card>
+        <LoadingState
+          loading={loading}
+          error={error}
+          showEmpty={!video}
+          emptyMessage="视频不存在"
+        >
+          {video && (
+            <>
+              <div style={{ flex: '1 1 70%' }}>
+                <Card
+                  style={{ backgroundColor: '#1d1d1d', marginBottom: '24px' }}
+                  bodyStyle={{ padding: 0 }}
+                >
+                  <div style={{ height: '600px' }}>
+                    <VideoPlayer 
+                      videoUrl={video.videoUrl} 
+                      poster={video.poster} 
+                      isLocal={video.isLocal}
+                    />
+                  </div>
+                </Card>
           
           <Card
             style={{ backgroundColor: '#1d1d1d' }}
@@ -147,6 +127,9 @@ const VideoDetail: React.FC = () => {
             )}
           />
         </Card>
+            </>
+          )}
+        </LoadingState>
       </Content>
     </Layout>
   );

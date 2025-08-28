@@ -11,34 +11,20 @@ import {
   CheckOutlined
 } from '@ant-design/icons'
 import { currentUser } from '../data/videos'
-import { localDataLoader } from '../utils/localDataLoader'
-import { Video } from '../types/video'
+import { useVideoData } from '../hooks/useVideoData'
+import LoadingState from '../components/LoadingState'
 
 const { Content } = Layout
 
 const Profile: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false)
   const [activeTab, setActiveTab] = useState('videos')
-  const [allVideos, setAllVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(true)
 
-  // 加载视频数据
-  React.useEffect(() => {
-    const loadVideos = async () => {
-      try {
-        const videos = await localDataLoader.getVideos()
-        setAllVideos(videos)
-      } catch (error) {
-        console.error('Failed to load videos for profile:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadVideos()
-  }, [])
+  // 使用统一的视频数据Hook
+  const { videos, loading, error, refetch } = useVideoData()
 
-  const userVideos = allVideos.filter(video => video.author.id === 'current_user')
-  const likedVideos = allVideos.filter(video => video.isLiked)
+  const userVideos = videos.filter(video => video.author.id === 'current_user')
+  const likedVideos = videos.filter(video => video.isLiked)
 
   return (
     <Layout style={{ backgroundColor: '#000000', height: '100%', overflow: 'auto' }}>
