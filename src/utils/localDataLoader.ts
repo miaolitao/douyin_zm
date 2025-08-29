@@ -54,19 +54,47 @@ export class LocalDataLoader {
     try {
       console.log('开始加载本地视频数据...')
       
-      const response = await fetch('/json/search_contents_2025-08-28.json')
+      // 获取所有可用的JSON文件
+      const allVideosData: any[] = []
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      // 尝试加载不同日期的search_contents文件
+      // 动态尝试最近几天的数据文件
+      const today = new Date()
+      const datePatterns: string[] = []
+      
+      // 生成最近7天的日期模式
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(today)
+        date.setDate(today.getDate() - i)
+        const dateStr = date.toISOString().split('T')[0] // YYYY-MM-DD格式
+        datePatterns.push(dateStr)
       }
       
-      const data = await response.json()
+      console.log('尝试加载日期:', datePatterns)
       
-      if (!Array.isArray(data)) {
-        throw new Error('数据格式错误：期望数组格式')
+      for (const date of datePatterns) {
+        try {
+          const response = await fetch(`/json/search_contents_${date}.json`)
+          if (response.ok) {
+            const data = await response.json()
+            if (Array.isArray(data)) {
+              allVideosData.push(...data)
+              console.log(`✅ 成功加载 ${date} 的数据:`, data.length, '个视频')
+            }
+          } else {
+            console.log(`⚠️  ${date} 的数据文件不存在`)
+          }
+        } catch (error) {
+          console.log(`⚠️  无法加载 ${date} 的数据:`, error instanceof Error ? error.message : error)
+          // 继续尝试其他日期的文件
+        }
       }
       
-      this.videosData = data
+      if (allVideosData.length === 0) {
+        throw new Error('未找到任何有效的视频数据文件')
+      }
+      
+      this.videosData = allVideosData
       
       // 处理数据并去除重复项
       const processedVideos = this.videosData.map(rawData => this.transformToVideo(rawData))
