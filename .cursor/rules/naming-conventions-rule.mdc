@@ -1,0 +1,7 @@
+---
+description: 强制执行 React 和 TypeScript 代码的特定命名约定以保持一致性。
+globs: **/*.{ts,tsx,js,jsx}
+---
+- 遵循变量、函数和组件的标准 TypeScript 和 JavaScript 命名约定。
+- 组件名称应使用 PascalCase（帕斯卡命名法）。
+- 变量和函数名称应使用 camelCase（驼峰命名法）。

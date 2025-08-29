@@ -1,0 +1,7 @@
+---
+description: UI 和样式的指导原则，专注于 Tailwind CSS 和 Shadcn UI 最佳实践。
+globs: **/*.{ts,tsx,js,jsx}
+---
+- 使用 Tailwind CSS 实用类来为组件添加样式。
+- 遵循 Shadcn UI 组件指南和最佳实践。
+- 确保 UI 是响应式和无障碍的。
