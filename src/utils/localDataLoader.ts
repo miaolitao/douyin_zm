@@ -54,7 +54,7 @@ export class LocalDataLoader {
     try {
       console.log('开始加载本地视频数据...')
       
-      const response = await fetch('/search_contents_2025-08-28.json')
+      const response = await fetch('/json/search_contents_2025-08-28.json')
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
