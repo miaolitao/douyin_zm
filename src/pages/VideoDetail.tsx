@@ -58,6 +58,8 @@ const VideoDetail: React.FC = () => {
                       videoUrl={video.videoUrl} 
                       poster={video.poster} 
                       isLocal={video.isLocal}
+                      video={video}
+                      showInteractions={true}
                     />
                   </div>
                 </Card>

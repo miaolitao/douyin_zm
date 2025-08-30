@@ -12,7 +12,9 @@ import Food from './pages/Food'
 import Knowledge from './pages/Knowledge'
 import Sports from './pages/Sports'
 import VideoDetail from './pages/VideoDetail'
+import Profile from './pages/Profile'
 import Demo from './components/Demo'
+import InteractionTestDemo from './components/InteractionTestDemo'
 
 const { Content } = Layout
 
@@ -37,6 +39,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/demo" element={<Demo />} />
+              <Route path="/test" element={<InteractionTestDemo />} />
               <Route path="/featured" element={<Featured />} />
               <Route path="/game" element={<Game />} />
               <Route path="/anime" element={<Anime />} />
@@ -44,6 +47,7 @@ const App: React.FC = () => {
               <Route path="/food" element={<Food />} />
               <Route path="/knowledge" element={<Knowledge />} />
               <Route path="/sports" element={<Sports />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/video/:id" element={<VideoDetail />} />
             </Routes>
           </Content>

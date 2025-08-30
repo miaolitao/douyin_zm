@@ -131,17 +131,33 @@ const Sidebar: React.FC = () => {
         borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         marginTop: 'auto'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-          <Avatar 
-            size={40} 
-            src="https://via.placeholder.com/40x40/ff0050/ffffff?text=U" 
-            style={{ marginRight: '12px' }}
-          />
-          <div>
-            <div style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>用户名</div>
-            <div style={{ color: '#888', fontSize: '12px' }}>查看个人资料</div>
+        <Link to="/profile" style={{ textDecoration: 'none' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            marginBottom: '12px',
+            padding: '8px',
+            borderRadius: '12px',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}
+          className="user-info-hover"
+          >
+            <Avatar 
+              size={40} 
+              src="https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_724c0d4aa68cf5c9c275e3bf3949f029.jpeg?card_type=303&column_n=0&from=327834062" 
+              style={{ 
+                marginRight: '12px',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                transition: 'all 0.3s ease'
+              }}
+            />
+            <div>
+              <div style={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}>我的抖音</div>
+              <div style={{ color: '#888', fontSize: '12px' }}>查看个人资料</div>
+            </div>
           </div>
-        </div>
+        </Link>
         <Button 
           icon={<PlusOutlined />} 
           style={{ 

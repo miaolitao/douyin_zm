@@ -8,23 +8,31 @@ import {
   FullscreenOutlined,
   SettingOutlined
 } from '@ant-design/icons'
+import { Video } from '../types/video'
+import { useVideoInteraction } from '../hooks/useVideoInteraction'
+import VideoInteractionBar from './VideoInteractionBar'
+import CommentModal from './CommentModal'
 
 interface VideoPlayerProps {
   videoUrl: string
   poster?: string
   isLocal?: boolean // 标记是否为本地视频
+  video?: Video // 完整的视频数据，用于交互功能
   onPlay?: () => void
   onPause?: () => void
   onEnded?: () => void
+  showInteractions?: boolean // 是否显示交互按钮
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoUrl,
   poster,
   isLocal = false,
+  video,
   onPlay,
   onPause,
-  onEnded
+  onEnded,
+  showInteractions = true
 }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -33,10 +41,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isMuted, setIsMuted] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isSimulationMode, setIsSimulationMode] = useState(false)
+  const [showSimulationButton, setShowSimulationButton] = useState(false)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const controlsTimeoutRef = useRef<NodeJS.Timeout>()
+  const simulationStopRef = useRef<(() => void) | null>(null)
+
+  // 交互功能Hook（仅在有视频数据时使用）
+  const videoInteraction = video ? useVideoInteraction(video) : null
 
   useEffect(() => {
     const video = videoRef.current
@@ -52,8 +66,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
 
     const handleTimeUpdate = () => {
-      console.log('Video time update:', video.currentTime)
-      setCurrentTime(video.currentTime)
+      // 只在非模拟模式下更新时间
+      if (!isSimulationMode) {
+        console.log('Video time update:', video.currentTime)
+        setCurrentTime(video.currentTime)
+      }
     }
 
     const handleEnded = () => {
@@ -70,7 +87,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       video.removeEventListener('timeupdate', handleTimeUpdate)
       video.removeEventListener('ended', handleEnded)
     }
-  }, [onEnded])
+  }, [onEnded, isSimulationMode])
 
   useEffect(() => {
     if (showControls) {
@@ -96,9 +113,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     })
 
     if (isPlaying) {
-      video.pause()
-      setIsPlaying(false)
-      onPause?.()
+      if (isSimulationMode) {
+        // 如果是模拟模式，停止模拟播放
+        stopSimulation()
+      } else {
+        video.pause()
+        setIsPlaying(false)
+        onPause?.()
+      }
     } else {
       // 本地视频直接播放
       if (isLocal) {
@@ -114,50 +136,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             .catch((error) => {
               console.error('Error playing local video:', error)
               setIsPlaying(false)
+              setShowSimulationButton(true) // 本地视频播放失败时也显示模拟播放按钮
             })
         }
-      } else if (videoUrl.includes('douyin.com')) {
-        console.log('Attempting to play Douyin video with custom headers')
-        
-        // 创建带有抖音请求头的视频请求
-        const videoBlob = fetch(videoUrl, {
-          headers: {
-            'Referer': 'https://www.douyin.com/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Origin': 'https://www.douyin.com'
-          }
-        })
-        .then(response => response.blob())
-        .then(blob => {
-          const videoObjectURL = URL.createObjectURL(blob)
-          video.src = videoObjectURL
-          
-          const playPromise = video.play()
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                console.log('Douyin video started playing successfully')
-                setIsPlaying(true)
-                onPlay?.()
-              })
-              .catch((error) => {
-                console.error('Error playing Douyin video:', error)
-                console.log('Falling back to simulation mode')
-                // 如果真实播放失败，回退到模拟模式
-                startSimulation()
-              })
-          }
-        })
-        .catch(error => {
-          console.error('Failed to fetch Douyin video:', error)
-          console.log('Falling back to simulation mode')
-          startSimulation()
-        })
-      } else if (video.readyState === 0) {
-        // 其他视频无法加载时，启用模拟播放
-        console.log('Video not ready, simulating playback for demo')
-        startSimulation()
       } else {
+        // 对于在线视频，先尝试直接播放
+        console.log('Attempting to play online video:', videoUrl)
         const playPromise = video.play()
         if (playPromise !== undefined) {
           playPromise
@@ -168,8 +152,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             })
             .catch((error) => {
               console.error('Error playing video:', error)
+              console.log('Video playback failed, user can try simulation mode if needed')
               setIsPlaying(false)
+              setShowSimulationButton(true) // 显示模拟播放按钮
             })
+        } else {
+          // 如果video.play()返回undefined（旧浏览器），也尝试播放
+          try {
+            video.play()
+            setIsPlaying(true)
+            onPlay?.()
+          } catch (error) {
+            console.error('Error playing video (synchronous):', error)
+            setIsPlaying(false)
+            setShowSimulationButton(true) // 显示模拟播放按钮
+          }
         }
       }
     }
@@ -178,8 +175,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleSeek = (value: number) => {
     const video = videoRef.current
     if (!video) return
-    video.currentTime = value
-    setCurrentTime(value)
+    
+    if (isSimulationMode) {
+      // 在模拟模式下，直接设置时间
+      setCurrentTime(value)
+    } else {
+      // 真实播放模式下，设置视频时间
+      video.currentTime = value
+      setCurrentTime(value)
+    }
   }
 
   const handleVolumeChange = (value: number) => {
@@ -226,31 +230,31 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setShowControls(false)
   }
 
-  // 模拟播放功能
+  // 手动启动模拟播放
   const startSimulation = () => {
     console.log('Starting simulation mode')
+    setIsSimulationMode(true)
     setIsPlaying(true)
+    setShowSimulationButton(false)
     onPlay?.()
     
     // 设置一个默认的模拟时长（45秒，对应抖音视频）
     const simDuration = duration > 0 ? duration : 45
+    setDuration(simDuration)
     let currentSimTime = 0
     let shouldContinue = true
     
-    console.log('Simulation started with duration:', simDuration)
-    
     const simulateProgress = () => {
       if (shouldContinue && currentSimTime < simDuration) {
-        currentSimTime = Math.min(currentSimTime + 0.1, simDuration)
+        currentSimTime = Math.min(currentSimTime + 0.5, simDuration)
         setCurrentTime(currentSimTime)
-        setDuration(simDuration)
-        console.log('Simulated progress:', currentSimTime, '/', simDuration)
         
         if (currentSimTime < simDuration) {
-          setTimeout(simulateProgress, 100)
+          setTimeout(simulateProgress, 500) // 每500ms更新一次，更平滑
         } else {
           console.log('Simulation completed')
           setIsPlaying(false)
+          setIsSimulationMode(false)
           onEnded?.()
         }
       }
@@ -258,13 +262,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     
     simulateProgress()
     
-    // 当停止播放时，停止模拟
-    const cleanup = () => {
+    // 保存停止函数到ref，供外部调用
+    simulationStopRef.current = () => {
       shouldContinue = false
     }
-    
-    // 返回清理函数
-    return cleanup
+  }
+
+  // 停止模拟播放
+  const stopSimulation = () => {
+    // 停止模拟进度更新
+    if (simulationStopRef.current) {
+      simulationStopRef.current()
+      simulationStopRef.current = null
+    }
+    setIsSimulationMode(false)
+    setIsPlaying(false)
+    setCurrentTime(0)
+    onPause?.()
   }
 
   // 截图功能示例（可选）
@@ -323,6 +337,65 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }}
           />
         </div>
+      )}
+
+      {/* 模拟播放按钮 */}
+      {showSimulationButton && !isPlaying && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '80px',
+            right: '20px',
+            backgroundColor: 'rgba(255, 165, 0, 0.9)',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            border: '2px solid rgba(255, 255, 255, 0.3)'
+          }}
+          onClick={startSimulation}
+        >
+          🎬 演示播放
+        </div>
+      )}
+
+      {/* 模拟播放状态提示 */}
+      {isSimulationMode && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            backgroundColor: 'rgba(255, 165, 0, 0.9)',
+            color: '#fff',
+            padding: '6px 12px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}
+        >
+          演示模式
+        </div>
+      )}
+
+      {/* 视频交互按钮 */}
+      {showInteractions && videoInteraction && (
+        <VideoInteractionBar
+          isLiked={videoInteraction.state.isLiked}
+          isFollowed={videoInteraction.state.isFollowed}
+          likes={videoInteraction.state.likes}
+          commentsCount={videoInteraction.state.commentsCount}
+          onToggleLike={videoInteraction.actions.toggleLike}
+          onToggleFollow={videoInteraction.actions.toggleFollow}
+          onToggleComments={videoInteraction.actions.toggleComments}
+          onShare={() => console.log('分享视频')}
+          formatNumber={videoInteraction.formatNumber}
+          likeAnimation={videoInteraction.state.likeAnimation}
+          followAnimation={videoInteraction.state.followAnimation}
+        />
       )}
 
       {/* 控制栏 */}
@@ -442,6 +515,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 评论模态框 */}
+      {videoInteraction && (
+        <CommentModal
+          visible={videoInteraction.state.isCommentsVisible}
+          onClose={() => videoInteraction.actions.toggleComments()}
+          comments={videoInteraction.state.comments}
+          onAddComment={videoInteraction.actions.addComment}
+          onAddReply={videoInteraction.actions.addReply}
+          onToggleCommentLike={videoInteraction.actions.toggleCommentLike}
+          onDeleteComment={videoInteraction.actions.deleteComment}
+          onDeleteReply={videoInteraction.actions.deleteReply}
+          formatTime={videoInteraction.formatTime}
+          formatNumber={videoInteraction.formatNumber}
+        />
+      )}
     </div>
   )
 }
