@@ -64,3 +64,4 @@ export const SCREENSHOT_CONFIG = {
   defaultPrefix: 'douyin-screenshot'
 }
 
+

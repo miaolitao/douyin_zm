@@ -233,3 +233,4 @@ export class SearchHistoryManager {
 export const searchHistoryManager = SearchHistoryManager.getInstance()
 
 
+
