@@ -232,3 +232,4 @@ export class SearchHistoryManager {
 // 导出单例实例
 export const searchHistoryManager = SearchHistoryManager.getInstance()
 
+

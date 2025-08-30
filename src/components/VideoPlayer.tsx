@@ -284,8 +284,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   // 截图功能示例（可选）
   const takeScreenshot = async () => {
     // 使用 Playwright 截图时，可以这样设置路径：
+    // import { getUserPaths } from '../config/paths'
+    // const userPaths = getUserPaths()
     // await page.screenshot({ 
-    //   path: './custom-screenshots/video-player.png',
+    //   path: `${userPaths.screenshots}/video-player.png`,
     //   fullPage: true 
     // })
     console.log('Screenshot functionality ready')

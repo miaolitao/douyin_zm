@@ -15,7 +15,8 @@ import {
   VideoCameraOutlined,
   PlusOutlined,
   SearchOutlined,
-  ExperimentOutlined
+  ExperimentOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 
 const { Sider } = Layout
@@ -79,6 +80,12 @@ const Sidebar: React.FC = () => {
       key: '/sports',
       icon: <TrophyOutlined style={{ fontSize: '20px', color: '#888' }} />,
       label: <Link to="/sports" style={{ fontSize: '14px', color: '#888' }}>体育</Link>
+    },
+    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.1)', margin: '12px 0' } },
+    {
+      key: '/settings',
+      icon: <SettingOutlined style={{ fontSize: '20px', color: '#ff0050' }} />,
+      label: <Link to="/settings" style={{ fontSize: '14px', color: '#ff0050', fontWeight: 500 }}>设置</Link>
     }
   ]
 

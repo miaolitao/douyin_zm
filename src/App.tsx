@@ -13,6 +13,7 @@ import Knowledge from './pages/Knowledge'
 import Sports from './pages/Sports'
 import VideoDetail from './pages/VideoDetail'
 import Profile from './pages/Profile'
+import Settings from './pages/Settings'
 import Demo from './components/Demo'
 import InteractionTestDemo from './components/InteractionTestDemo'
 
@@ -48,6 +49,7 @@ const App: React.FC = () => {
               <Route path="/knowledge" element={<Knowledge />} />
               <Route path="/sports" element={<Sports />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/video/:id" element={<VideoDetail />} />
             </Routes>
           </Content>

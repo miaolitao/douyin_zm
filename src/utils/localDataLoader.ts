@@ -1,4 +1,5 @@
 import { Video, Author } from '../types/video'
+import { getUserPaths } from '../config/paths'
 
 interface RawVideoData {
   aweme_id: string
@@ -72,9 +73,17 @@ export class LocalDataLoader {
       
       console.log('尝试加载日期:', datePatterns)
       
+      const userPaths = getUserPaths()
+      
       for (const date of datePatterns) {
         try {
-          const response = await fetch(`/json/search_contents_${date}.json`)
+          // 使用配置的JSON路径，如果是相对路径则转换为绝对路径
+          let jsonPath = userPaths.json
+          if (jsonPath.startsWith('./')) {
+            jsonPath = jsonPath.replace('./', '/')
+          }
+          
+          const response = await fetch(`${jsonPath}/search_contents_${date}.json`)
           if (response.ok) {
             const data = await response.json()
             if (Array.isArray(data)) {
@@ -155,13 +164,23 @@ export class LocalDataLoader {
 
   // 获取本地视频路径
   private getLocalVideoPath(awemeId: string): string {
-    return `/videos/${awemeId}/video.mp4`
+    const userPaths = getUserPaths()
+    let videosPath = userPaths.videos
+    if (videosPath.startsWith('./')) {
+      videosPath = videosPath.replace('./', '/')
+    }
+    return `${videosPath}/${awemeId}/video.mp4`
   }
 
   // 获取本地封面图片路径
   private getLocalCoverPath(awemeId: string): string {
     if (this.checkLocalImageExists(awemeId)) {
-      return `/images/${awemeId}/000.jpeg`
+      const userPaths = getUserPaths()
+      let imagesPath = userPaths.images
+      if (imagesPath.startsWith('./')) {
+        imagesPath = imagesPath.replace('./', '/')
+      }
+      return `${imagesPath}/${awemeId}/000.jpeg`
     }
     // 如果没有本地图片，使用默认占位图
     return '/placeholder-cover.svg'
