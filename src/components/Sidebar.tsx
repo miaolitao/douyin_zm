@@ -27,91 +27,103 @@ const Sidebar: React.FC = () => {
   const menuItems: MenuProps['items'] = [
     {
       key: '/',
-      icon: <HomeOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <Link to="/" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>首页</Link>
+      icon: <HomeOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.8)' }} />,
+      label: <Link to="/" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.9)', textDecoration: 'none' }}>首页</Link>
     },
     {
       key: '/featured',
-      icon: <FireOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <Link to="/featured" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>热门</Link>
+      icon: <FireOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.8)' }} />,
+      label: <Link to="/featured" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.9)', textDecoration: 'none' }}>热门</Link>
     },
     {
       key: '/follow',
-      icon: <HeartOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <Link to="/follow" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>关注</Link>
+      icon: <HeartOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.8)' }} />,
+      label: <Link to="/follow" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.9)', textDecoration: 'none' }}>关注</Link>
     },
     {
       key: '/friend',
-      icon: <UserOutlined style={{ fontSize: '24px', color: '#fff' }} />,
-      label: <Link to="/friend" style={{ fontSize: '16px', fontWeight: 500, color: '#fff', textDecoration: 'none' }}>朋友</Link>
+      icon: <UserOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.8)' }} />,
+      label: <Link to="/friend" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.9)', textDecoration: 'none' }}>朋友</Link>
     },
-    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.1)', margin: '16px 0' } },
+    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.08)', margin: '12px 0' } },
     {
       key: '/demo',
-      icon: <ExperimentOutlined style={{ fontSize: '20px', color: '#ff0050' }} />,
-      label: <Link to="/demo" style={{ fontSize: '15px', color: '#ff0050', fontWeight: 600 }}>演示页面</Link>
+      icon: <ExperimentOutlined style={{ fontSize: '18px', color: '#fe2c55' }} />,
+      label: <Link to="/demo" style={{ fontSize: '13px', color: '#fe2c55', fontWeight: 600, textDecoration: 'none' }}>演示页面</Link>
     },
     {
       key: '/game',
-      icon: <PlaySquareOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/game" style={{ fontSize: '14px', color: '#888' }}>游戏</Link>
+      icon: <PlaySquareOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/game" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>游戏</Link>
     },
     {
       key: '/anime',
-      icon: <PlaySquareOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/anime" style={{ fontSize: '14px', color: '#888' }}>二次元</Link>
+      icon: <PlaySquareOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/anime" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>二次元</Link>
     },
     {
       key: '/music',
-      icon: <CustomerServiceOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/music" style={{ fontSize: '14px', color: '#888' }}>音乐</Link>
+      icon: <CustomerServiceOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/music" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>音乐</Link>
     },
     {
       key: '/food',
-      icon: <CoffeeOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/food" style={{ fontSize: '14px', color: '#888' }}>美食</Link>
+      icon: <CoffeeOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/food" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>美食</Link>
     },
     {
       key: '/knowledge',
-      icon: <ReadOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/knowledge" style={{ fontSize: '14px', color: '#888' }}>知识</Link>
+      icon: <ReadOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/knowledge" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>知识</Link>
     },
     {
       key: '/sports',
-      icon: <TrophyOutlined style={{ fontSize: '20px', color: '#888' }} />,
-      label: <Link to="/sports" style={{ fontSize: '14px', color: '#888' }}>体育</Link>
+      icon: <TrophyOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }} />,
+      label: <Link to="/sports" style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none' }}>体育</Link>
     },
-    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.1)', margin: '12px 0' } },
+    { type: 'divider', style: { background: 'rgba(255, 255, 255, 0.08)', margin: '8px 0' } },
     {
       key: '/settings',
-      icon: <SettingOutlined style={{ fontSize: '20px', color: '#ff0050' }} />,
-      label: <Link to="/settings" style={{ fontSize: '14px', color: '#ff0050', fontWeight: 500 }}>设置</Link>
+      icon: <SettingOutlined style={{ fontSize: '18px', color: '#fe2c55' }} />,
+      label: <Link to="/settings" style={{ fontSize: '13px', color: '#fe2c55', fontWeight: 500, textDecoration: 'none' }}>设置</Link>
     }
   ]
 
   return (
     <Sider
-      width={240}
+      width={220}
       style={{
         backgroundColor: '#000000',
-        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-        paddingTop: '20px',
+        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+        paddingTop: '16px',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)'
       }}
     >
       {/* 搜索框 */}
-      <div style={{ padding: '0 20px 20px' }}>
+      <div style={{ padding: '0 16px 16px' }}>
         <Button 
-          icon={<SearchOutlined />} 
+          icon={<SearchOutlined style={{ color: 'rgba(255, 255, 255, 0.4)' }} />} 
           style={{ 
             width: '100%', 
-            height: '40px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            border: 'none',
-            color: '#888',
-            borderRadius: '20px',
-            textAlign: 'left'
+            height: '36px',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'rgba(255, 255, 255, 0.6)',
+            borderRadius: '18px',
+            textAlign: 'left',
+            fontSize: '13px',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
           }}
         >
           搜索视频和用户

@@ -1,4 +1,4 @@
-/* 抖音首页样式 - 完全基于官网结构 */
+/* 抖音首页样式 - 像素级复刻官网 */
 * {
   margin: 0;
   padding: 0;
@@ -6,9 +6,13 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #000000;
   color: #ffffff;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 主容器 */
@@ -17,14 +21,16 @@ body {
   background-color: #000000;
 }
 
-/* 抖音官网风格的分类标签栏 */
+/* 抖音官网风格的分类标签栏 - 精确像素级复刻 */
 .discover-tab-container {
   position: sticky;
   top: 0;
   z-index: 100;
   background-color: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .discover-tab-bar {
@@ -34,6 +40,7 @@ body {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  height: 56px;
 }
 
 .discover-tab-bar::-webkit-scrollbar {
@@ -42,78 +49,115 @@ body {
 
 .discover-tab {
   position: relative;
-  padding: 16px 24px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
-  font-weight: 500;
+  padding: 16px 20px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 15px;
+  font-weight: 400;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 2px solid transparent;
+  min-width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .discover-tab:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .discover-tab.active {
   color: #ffffff;
-  font-weight: 600;
-  border-bottom-color: #ff0050;
+  font-weight: 500;
+  border-bottom-color: #fe2c55;
 }
 
-/* 主内容区域 */
+.discover-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #fe2c55 0%, #ff0050 100%);
+  border-radius: 1px;
+}
+
+/* 主内容区域 - 精确对齐抖音布局 */
 .parent-route-container {
-  padding: 20px;
+  padding: 24px 24px 0;
 }
 
 .route-scroll-container {
-  height: calc(100vh - 120px);
+  height: calc(100vh - 116px);
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .route-scroll-container::-webkit-scrollbar {
-  display: none;
+  width: 4px;
 }
 
-/* 视频瀑布流 */
+.route-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.route-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.route-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 视频瀑布流 - 精确网格布局 */
 .waterfall-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px 12px;
+  padding: 16px 0 40px;
+  margin: 0 auto;
+  max-width: 1200px;
 }
 
-/* 视频卡片 - 完全按照抖音的样式 */
+/* 视频卡片 - 像素级复刻抖音样式 */
 .discover-video-card-item {
   background-color: transparent;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  will-change: transform;
 }
 
 .discover-video-card-item:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .waterfall-videoCardContainer {
   display: block;
   text-decoration: none;
   color: inherit;
+  width: 100%;
+  height: 100%;
 }
 
-/* 视频图片容器 */
+/* 视频图片容器 - 精确尺寸控制 */
 .videoImage {
   position: relative;
   width: 100%;
-  padding-top: 75%; /* 4:3 比例 */
-  background-color: #000000;
-  border-radius: 8px;
+  padding-top: 133.33%; /* 3:4 比例，更接近抖音视频比例 */
+  background-color: #161823;
+  border-radius: 6px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .videoImageInner {
@@ -128,139 +172,178 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 70%, rgba(0, 0, 0, 0.3) 100%);
 }
 
-/* 视频封面图片 */
+/* 视频封面图片 - 优化显示效果 */
 .discover-video-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  object-position: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #161823;
 }
 
 .discover-video-card-item:hover .discover-video-card-img {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
-/* 播放按钮 */
+/* 播放按钮 - 抖音风格精确复刻 */
 .playButton {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
-  background-color: rgba(0, 0, 0, 0.6);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .discover-video-card-item:hover .playButton {
   opacity: 1;
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 .playButton svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+  margin-left: 2px; /* 视觉居中调整 */
 }
 
-/* 视频时长 */
+.playButton svg path {
+  fill: rgba(0, 0, 0, 0.8);
+}
+
+/* 视频时长 - 精确样式 */
 .videoDuration {
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
   color: #ffffff;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* 点赞数 */
+/* 点赞数 - 优化显示 */
 .likeCount {
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
   color: #ffffff;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 11px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
 }
 
 .likeIcon {
-  color: #ff0050;
-  font-size: 14px;
+  color: #fe2c55;
+  font-size: 12px;
 }
 
-/* 视频信息区域 */
+/* 视频信息区域 - 精确样式复刻 */
 .videoInfo {
-  padding: 12px 0;
+  padding: 10px 2px 4px;
 }
 
 .videoTitle {
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 400;
   line-height: 1.4;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .videoMeta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 2px;
 }
 
 .authorInfo {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+  gap: 2px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  flex: 1;
+  min-width: 0;
 }
 
 .authorPrefix {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
 }
 
 .authorName {
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .publishTime {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .videoStats {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  gap: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.videoStats:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .videoStats svg {
-  width: 16px;
-  height: 16px;
-  opacity: 0.7;
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
 }
 
 
