@@ -245,3 +245,6 @@ export const searchHistoryManager = SearchHistoryManager.getInstance()
 
 
 
+
+
+

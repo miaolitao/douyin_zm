@@ -8,7 +8,8 @@ import {
   PlusOutlined,
   CloseOutlined,
   MinusOutlined,
-  BorderOutlined
+  BorderOutlined,
+  DesktopOutlined
 } from '@ant-design/icons'
 import SearchModal from './SearchModal'
 
@@ -27,22 +28,19 @@ const TitleBar: React.FC = () => {
       <Header
         style={{
           height: '60px',
-          backgroundColor: '#000000',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: 'var(--douyin-bg-main)',
+          borderBottom: '1px solid var(--douyin-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 24px',
           WebkitAppRegion: 'drag',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
           position: 'relative',
           zIndex: 100
-        }}
+        } as any}
       >
-        {/* 左侧Logo和搜索 */}
+        {/* 左侧Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {/* Logo */}
           <div 
             style={{ 
               display: 'flex', 
@@ -50,160 +48,100 @@ const TitleBar: React.FC = () => {
               gap: '8px',
               cursor: 'pointer',
               WebkitAppRegion: 'no-drag',
-              padding: '4px 8px',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
+            } as any}
             onClick={handleLogoClick}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }}
           >
             <div style={{
-              width: '30px',
-              height: '30px',
+              width: '32px',
+              height: '32px',
               background: 'linear-gradient(135deg, #fe2c55 0%, #ff0050 50%, #e91e63 100%)',
-              borderRadius: '6px',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#fff',
-              fontSize: '16px',
+              fontSize: '18px',
               fontWeight: 'bold',
-              boxShadow: '0 2px 8px rgba(254, 44, 85, 0.3)',
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              boxShadow: '0 2px 8px rgba(254, 44, 85, 0.3)'
             }}>
-              抖
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36 14L36 11C36 9.89543 35.1046 9 34 9L14 9C12.8954 9 12 9.89543 12 11L12 37C12 38.1046 12.8954 39 14 39L34 39C35.1046 39 36 38.1046 36 37L36 34" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M24 19L24 29" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M20 23L24 19L28 23" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
             <span style={{ 
               color: '#fff', 
-              fontSize: '18px', 
+              fontSize: '20px', 
               fontWeight: '600',
-              marginLeft: '8px',
-              letterSpacing: '0.5px',
-              transition: 'color 0.2s ease'
+              letterSpacing: '0.5px'
             }}>
               抖音
             </span>
           </div>
+        </div>
 
-          {/* 搜索框 */}
-          <div style={{ position: 'relative' }}>
-            <Input
-              placeholder="搜索视频、用户、话题"
-              prefix={<SearchOutlined style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '16px' }} />}
-              style={{
-                width: '320px',
-                height: '36px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '18px',
-                color: '#fff',
-                WebkitAppRegion: 'no-drag',
-                cursor: 'pointer',
-                fontSize: '14px',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-              readOnly
-              onClick={() => setSearchModalVisible(true)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-              }}
-            />
-          </div>
+        {/* 中间搜索框 (可选，如果侧边栏已有搜索，这里可以放其他内容，或者保留作为全局搜索) */}
+        {/* 抖音PC版顶部通常是空的或者有搜索，这里保留搜索但样式微调 */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', WebkitAppRegion: 'no-drag' } as any}>
+          {/* 
+          <Input
+            placeholder="搜索你感兴趣的内容"
+            prefix={<SearchOutlined style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '16px' }} />}
+            style={{
+              width: '400px',
+              height: '40px',
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+            }}
+            readOnly
+            onClick={() => setSearchModalVisible(true)}
+          />
+          */}
         </div>
 
         {/* 右侧操作按钮 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', WebkitAppRegion: 'no-drag' }}>
-          {/* 通知 */}
-          <Badge count={3} size="small" style={{ 
-            color: '#fe2c55',
-            backgroundColor: '#fe2c55' 
-          }}>
-            <Button
-              type="text"
-              icon={<BellOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.8)' }} />}
-              style={{ 
-                width: '36px', 
-                height: '36px',
-                backgroundColor: 'transparent',
-                border: 'none',
-                borderRadius: '18px',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }}
-            />
-          </Badge>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', WebkitAppRegion: 'no-drag' } as any}>
+          <Button
+            type="text"
+            icon={<DesktopOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.6)' }} />}
+            style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+          >
+            客户端
+          </Button>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
 
           {/* 消息 */}
-          <Badge count={5} size="small" style={{ 
-            color: '#fe2c55',
-            backgroundColor: '#fe2c55' 
-          }}>
+          <Badge count={5} size="small" offset={[-4, 4]}>
             <Button
               type="text"
-              icon={<MessageOutlined style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.8)' }} />}
+              icon={<MessageOutlined style={{ fontSize: '20px', color: 'rgba(255, 255, 255, 0.6)' }} />}
               style={{ 
-                width: '36px', 
-                height: '36px',
-                backgroundColor: 'transparent',
-                border: 'none',
-                borderRadius: '18px',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                width: '40px', 
+                height: '40px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }}
             />
           </Badge>
 
-          {/* 上传按钮 */}
+          {/* 投稿按钮 */}
           <Button
             type="primary"
-            icon={<PlusOutlined style={{ fontSize: '14px' }} />}
+            icon={<PlusOutlined />}
             style={{
-              height: '32px',
-              background: 'linear-gradient(135deg, #fe2c55 0%, #ff0050 100%)',
-              border: 'none',
-              borderRadius: '16px',
-              fontWeight: '500',
-              fontSize: '13px',
-              padding: '0 16px',
-              boxShadow: '0 2px 8px rgba(254, 44, 85, 0.3)',
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(254, 44, 85, 0.4)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(254, 44, 85, 0.3)'
+              height: '36px',
+              borderRadius: '4px',
+              padding: '0 20px',
+              fontSize: '14px',
+              fontWeight: 500
             }}
           >
-            上传
+            投稿
           </Button>
 
           {/* 用户头像 */}
@@ -212,53 +150,26 @@ const TitleBar: React.FC = () => {
             src="https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_724c0d4aa68cf5c9c275e3bf3949f029.jpeg?card_type=303&column_n=0&from=327834062"
             style={{ 
               cursor: 'pointer',
-              border: '2px solid rgba(255, 255, 255, 0.1)',
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(254, 44, 85, 0.5)'
-              e.currentTarget.style.transform = 'scale(1.05)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-              e.currentTarget.style.transform = 'scale(1)'
+              border: '1px solid rgba(255, 255, 255, 0.1)'
             }}
           />
 
           {/* 窗口控制按钮 */}
-          <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginLeft: '12px' }}>
             <Button
               type="text"
               icon={<MinusOutlined style={{ color: '#888' }} />}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                borderRadius: '16px'
-              }}
+              style={{ width: '32px', height: '32px' }}
             />
             <Button
               type="text"
               icon={<BorderOutlined style={{ color: '#888' }} />}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                borderRadius: '16px'
-              }}
+              style={{ width: '32px', height: '32px' }}
             />
             <Button
               type="text"
               icon={<CloseOutlined style={{ color: '#888' }} />}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                borderRadius: '16px'
-              }}
+              style={{ width: '32px', height: '32px' }}
             />
           </div>
         </div>

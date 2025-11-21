@@ -1,13 +1,9 @@
 import React from 'react'
 import { Button, Tooltip } from 'antd'
 import { 
-  HeartOutlined, 
   HeartFilled, 
-  UserAddOutlined, 
-  UserDeleteOutlined,
-  MessageOutlined,
+  MessageFilled,
   ShareAltOutlined,
-  StarOutlined,
   StarFilled
 } from '@ant-design/icons'
 
@@ -45,11 +41,11 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: vertical ? 'column' : 'row',
-    gap: vertical ? '16px' : '12px',
+    gap: vertical ? '20px' : '12px',
     alignItems: 'center',
     position: 'absolute',
     right: vertical ? '16px' : 'auto',
-    bottom: vertical ? '80px' : '16px',
+    bottom: vertical ? '100px' : '16px',
     left: vertical ? 'auto' : '16px',
     zIndex: 10
   }
@@ -58,39 +54,34 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
     width: vertical ? '48px' : '40px',
     height: vertical ? '48px' : '40px',
     borderRadius: '50%',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'transparent',
     border: 'none',
     color: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    backdropFilter: 'blur(8px)',
-    fontSize: vertical ? '20px' : '16px'
+    transition: 'all 0.2s ease',
+    fontSize: vertical ? '32px' : '24px',
+    padding: 0,
+    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
   }
 
   const animatedButtonStyle: React.CSSProperties = {
     ...buttonStyle,
     animation: likeAnimation ? 'likeAnimation 0.8s ease' : undefined,
     transform: likeAnimation ? 'scale(1.2)' : 'scale(1)',
-    backgroundColor: isLiked ? 'rgba(255, 0, 80, 0.8)' : 'rgba(0, 0, 0, 0.6)'
-  }
-
-  const followButtonStyle: React.CSSProperties = {
-    ...buttonStyle,
-    animation: followAnimation ? 'followAnimation 0.6s ease' : undefined,
-    backgroundColor: isFollowed ? 'rgba(255, 0, 80, 0.8)' : 'rgba(0, 0, 0, 0.6)',
-    transform: followAnimation ? 'scale(1.1)' : 'scale(1)'
+    color: isLiked ? '#fe2c55' : '#fff'
   }
 
   const labelStyle: React.CSSProperties = {
-    fontSize: '12px',
+    fontSize: '13px',
     color: '#fff',
     textAlign: 'center',
-    marginTop: '4px',
-    textShadow: '0 1px 3px rgba(0, 0, 0, 0.8)',
-    minWidth: '32px'
+    marginTop: '2px',
+    textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+    minWidth: '32px',
+    fontWeight: 500
   }
 
   const handleShare = () => {
@@ -126,25 +117,13 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
             100% { transform: scale(1); }
           }
           
-          @keyframes followAnimation {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.15); }
-            50% { transform: scale(1.05); }
-            75% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-          }
-          
-          .interaction-button:hover {
+          .interaction-icon:hover {
             transform: scale(1.1);
-            backgroundColor: rgba(255, 255, 255, 0.2);
+            opacity: 0.9;
           }
           
-          .interaction-button.liked {
-            backgroundColor: rgba(255, 0, 80, 0.8) !important;
-          }
-          
-          .interaction-button.followed {
-            backgroundColor: rgba(255, 0, 80, 0.8) !important;
+          .interaction-icon:active {
+            transform: scale(0.9);
           }
 
           .heart-particles {
@@ -170,14 +149,16 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
       </style>
 
       <div style={containerStyle}>
+        {/* 关注按钮 (头像下方的加号，通常集成在头像组件中，这里简化处理) */}
+        
         {/* 点赞按钮 */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Tooltip title={isLiked ? '取消点赞' : '点赞'} placement="left">
             <Button
               style={animatedButtonStyle}
-              className={`interaction-button ${isLiked ? 'liked' : ''}`}
+              className="interaction-icon"
               onClick={onToggleLike}
-              icon={isLiked ? <HeartFilled /> : <HeartOutlined />}
+              icon={<HeartFilled />}
             />
           </Tooltip>
           {showLabels && (
@@ -187,31 +168,14 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
           )}
         </div>
 
-        {/* 关注按钮 */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Tooltip title={isFollowed ? '取消关注' : '关注'} placement="left">
-            <Button
-              style={followButtonStyle}
-              className={`interaction-button ${isFollowed ? 'followed' : ''}`}
-              onClick={onToggleFollow}
-              icon={isFollowed ? <UserDeleteOutlined /> : <UserAddOutlined />}
-            />
-          </Tooltip>
-          {showLabels && (
-            <div style={labelStyle}>
-              {isFollowed ? '已关注' : '关注'}
-            </div>
-          )}
-        </div>
-
         {/* 评论按钮 */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Tooltip title="评论" placement="left">
             <Button
               style={buttonStyle}
-              className="interaction-button"
+              className="interaction-icon"
               onClick={onToggleComments}
-              icon={<MessageOutlined />}
+              icon={<MessageFilled />}
             />
           </Tooltip>
           {showLabels && (
@@ -226,9 +190,9 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
           <Tooltip title="收藏" placement="left">
             <Button
               style={buttonStyle}
-              className="interaction-button"
+              className="interaction-icon"
               onClick={() => console.log('收藏功能待实现')}
-              icon={<StarOutlined />}
+              icon={<StarFilled />}
             />
           </Tooltip>
           {showLabels && (
@@ -243,7 +207,7 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
           <Tooltip title="分享" placement="left">
             <Button
               style={buttonStyle}
-              className="interaction-button"
+              className="interaction-icon"
               onClick={handleShare}
               icon={<ShareAltOutlined />}
             />
@@ -274,7 +238,7 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
                 position: 'absolute',
                 left: Math.random() * 40 - 20,
                 top: Math.random() * 20 - 10,
-                color: '#ff0050',
+                color: '#fe2c55',
                 fontSize: '16px',
                 animation: `heartParticle 1s ease-out ${i * 0.1}s`,
                 animationFillMode: 'both'
@@ -290,6 +254,9 @@ const VideoInteractionBar: React.FC<VideoInteractionBarProps> = ({
 }
 
 export default VideoInteractionBar
+
+
+
 
 
 
