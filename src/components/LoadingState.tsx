@@ -9,6 +9,7 @@ interface LoadingStateProps {
   children: React.ReactNode
   emptyMessage?: string
   showEmpty?: boolean
+  loadingComponent?: React.ReactNode
 }
 
 /**
@@ -21,10 +22,14 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   onRetry,
   children,
   emptyMessage = '暂无数据',
-  showEmpty = false
+  showEmpty = false,
+  loadingComponent
 }) => {
   // 加载中状态
   if (loading) {
+    if (loadingComponent) {
+      return <>{loadingComponent}</>
+    }
     return (
       <div style={{
         display: 'flex',

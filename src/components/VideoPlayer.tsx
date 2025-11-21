@@ -43,6 +43,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isSimulationMode, setIsSimulationMode] = useState(false)
   const [showSimulationButton, setShowSimulationButton] = useState(false)
+  const [isBuffering, setIsBuffering] = useState(false)
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -57,18 +59,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!video) return
 
     const handleLoadedMetadata = () => {
-      console.log('Video metadata loaded:', {
-        duration: video.duration,
-        videoWidth: video.videoWidth,
-        videoHeight: video.videoHeight
-      })
       setDuration(video.duration)
     }
 
     const handleTimeUpdate = () => {
       // 只在非模拟模式下更新时间
       if (!isSimulationMode) {
-        console.log('Video time update:', video.currentTime)
         setCurrentTime(video.currentTime)
       }
     }
@@ -78,14 +74,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onEnded?.()
     }
 
+    const handleWaiting = () => {
+      setIsBuffering(true)
+    }
+
+    const handleCanPlay = () => {
+      setIsBuffering(false)
+    }
+
     video.addEventListener('loadedmetadata', handleLoadedMetadata)
     video.addEventListener('timeupdate', handleTimeUpdate)
     video.addEventListener('ended', handleEnded)
+    video.addEventListener('waiting', handleWaiting)
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('playing', handleCanPlay)
 
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata)
       video.removeEventListener('timeupdate', handleTimeUpdate)
       video.removeEventListener('ended', handleEnded)
+      video.removeEventListener('waiting', handleWaiting)
+      video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('playing', handleCanPlay)
     }
   }, [onEnded, isSimulationMode])
 
@@ -104,17 +114,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current
     if (!video) return
 
-    console.log('Video state:', {
-      readyState: video.readyState,
-      networkState: video.networkState,
-      error: video.error,
-      src: video.src,
-      isLocal
-    })
-
     if (isPlaying) {
       if (isSimulationMode) {
-        // 如果是模拟模式，停止模拟播放
         stopSimulation()
       } else {
         video.pause()
@@ -122,42 +123,34 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onPause?.()
       }
     } else {
-      // 本地视频直接播放
       if (isLocal) {
-        console.log('Playing local video:', videoUrl)
         const playPromise = video.play()
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              console.log('Local video started playing successfully')
               setIsPlaying(true)
               onPlay?.()
             })
             .catch((error) => {
               console.error('Error playing local video:', error)
               setIsPlaying(false)
-              setShowSimulationButton(true) // 本地视频播放失败时也显示模拟播放按钮
+              setShowSimulationButton(true)
             })
         }
       } else {
-        // 对于在线视频，先尝试直接播放
-        console.log('Attempting to play online video:', videoUrl)
         const playPromise = video.play()
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              console.log('Video started playing successfully')
               setIsPlaying(true)
               onPlay?.()
             })
             .catch((error) => {
               console.error('Error playing video:', error)
-              console.log('Video playback failed, user can try simulation mode if needed')
               setIsPlaying(false)
-              setShowSimulationButton(true) // 显示模拟播放按钮
+              setShowSimulationButton(true)
             })
         } else {
-          // 如果video.play()返回undefined（旧浏览器），也尝试播放
           try {
             video.play()
             setIsPlaying(true)
@@ -165,7 +158,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           } catch (error) {
             console.error('Error playing video (synchronous):', error)
             setIsPlaying(false)
-            setShowSimulationButton(true) // 显示模拟播放按钮
+            setShowSimulationButton(true)
           }
         }
       }
@@ -177,10 +170,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!video) return
     
     if (isSimulationMode) {
-      // 在模拟模式下，直接设置时间
       setCurrentTime(value)
     } else {
-      // 真实播放模式下，设置视频时间
       video.currentTime = value
       setCurrentTime(value)
     }
@@ -232,13 +223,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   // 手动启动模拟播放
   const startSimulation = () => {
-    console.log('Starting simulation mode')
     setIsSimulationMode(true)
     setIsPlaying(true)
     setShowSimulationButton(false)
     onPlay?.()
     
-    // 设置一个默认的模拟时长（45秒，对应抖音视频）
     const simDuration = duration > 0 ? duration : 45
     setDuration(simDuration)
     let currentSimTime = 0
@@ -250,9 +239,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setCurrentTime(currentSimTime)
         
         if (currentSimTime < simDuration) {
-          setTimeout(simulateProgress, 500) // 每500ms更新一次，更平滑
+          setTimeout(simulateProgress, 500)
         } else {
-          console.log('Simulation completed')
           setIsPlaying(false)
           setIsSimulationMode(false)
           onEnded?.()
@@ -262,7 +250,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     
     simulateProgress()
     
-    // 保存停止函数到ref，供外部调用
     simulationStopRef.current = () => {
       shouldContinue = false
     }
@@ -270,7 +257,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   // 停止模拟播放
   const stopSimulation = () => {
-    // 停止模拟进度更新
     if (simulationStopRef.current) {
       simulationStopRef.current()
       simulationStopRef.current = null
@@ -279,18 +265,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setIsPlaying(false)
     setCurrentTime(0)
     onPause?.()
-  }
-
-  // 截图功能示例（可选）
-  const takeScreenshot = async () => {
-    // 使用 Playwright 截图时，可以这样设置路径：
-    // import { getUserPaths } from '../config/paths'
-    // const userPaths = getUserPaths()
-    // await page.screenshot({ 
-    //   path: `${userPaths.screenshots}/video-player.png`,
-    //   fullPage: true 
-    // })
-    console.log('Screenshot functionality ready')
   }
 
   return (
@@ -307,6 +281,60 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+      <style>
+        {`
+          .custom-slider .ant-slider-track {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            transition: height 0.2s;
+          }
+          .custom-slider:hover .ant-slider-track {
+            background-color: #fe2c55 !important;
+            height: 6px !important;
+          }
+          .custom-slider .ant-slider-rail {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            height: 4px !important;
+            transition: height 0.2s;
+          }
+          .custom-slider:hover .ant-slider-rail {
+            height: 6px !important;
+          }
+          .custom-slider .ant-slider-handle {
+            display: none;
+          }
+          .custom-slider:hover .ant-slider-handle {
+            display: block;
+            border-color: #fff !important;
+            background-color: #fff !important;
+            width: 12px;
+            height: 12px;
+            margin-top: -3px;
+          }
+          
+          .volume-slider-container {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 100px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            padding: 12px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+          }
+          
+          .volume-control:hover .volume-slider-container {
+            opacity: 1;
+            visibility: visible;
+          }
+        `}
+      </style>
+
       <video
         ref={videoRef}
         src={videoUrl}
@@ -319,23 +347,46 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onClick={togglePlay}
       />
 
-      {/* 播放按钮覆盖层 */}
-      {!isPlaying && (
+      {/* 缓冲加载动画 */}
+      {isBuffering && (
         <div
           style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            cursor: 'pointer'
+            zIndex: 10
+          }}
+        >
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid rgba(255, 255, 255, 0.3)',
+            borderTop: '3px solid #fe2c55',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+        </div>
+      )}
+
+      {/* 播放按钮覆盖层 */}
+      {!isPlaying && !isBuffering && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            cursor: 'pointer',
+            zIndex: 10
           }}
           onClick={togglePlay}
         >
           <PlayCircleOutlined
             style={{
-              fontSize: '80px',
-              color: 'rgba(255, 255, 255, 0.9)',
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
+              fontSize: '64px',
+              color: 'rgba(255, 255, 255, 0.8)',
+              filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5))'
             }}
           />
         </div>
@@ -356,30 +407,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             fontSize: '14px',
             fontWeight: 'bold',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            border: '2px solid rgba(255, 255, 255, 0.3)'
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+            zIndex: 20
           }}
           onClick={startSimulation}
         >
           🎬 演示播放
-        </div>
-      )}
-
-      {/* 模拟播放状态提示 */}
-      {isSimulationMode && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            backgroundColor: 'rgba(255, 165, 0, 0.9)',
-            color: '#fff',
-            padding: '6px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: 'bold'
-          }}
-        >
-          演示模式
         </div>
       )}
 
@@ -407,32 +440,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.8))',
-          padding: '20px',
+          background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.6))',
+          padding: '0 12px 12px',
           opacity: showControls ? 1 : 0,
           transition: 'opacity 0.3s ease',
-          pointerEvents: showControls ? 'auto' : 'none'
+          pointerEvents: showControls ? 'auto' : 'none',
+          zIndex: 20
         }}
       >
         {/* 进度条 */}
-        <Slider
-          value={currentTime}
-          max={duration}
-          onChange={handleSeek}
-          tooltip={{
-            formatter: (value) => formatTime(value || 0)
-          }}
-          style={{
-            marginBottom: '16px'
-          }}
-          trackStyle={{ backgroundColor: '#ff0050' }}
-          handleStyle={{ borderColor: '#ff0050' }}
-          railStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
-        />
+        <div style={{ marginBottom: '10px', padding: '0 4px' }}>
+          <Slider
+            className="custom-slider"
+            value={currentTime}
+            max={duration}
+            onChange={handleSeek}
+            tooltip={{
+              formatter: (value) => formatTime(value || 0),
+              open: false // 禁用默认tooltip，因为我们有自定义样式
+            }}
+            style={{ margin: 0, padding: '4px 0' }}
+          />
+        </div>
 
         {/* 控制按钮 */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             {/* 播放/暂停 */}
             <Button
               type="text"
@@ -440,77 +473,85 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onClick={togglePlay}
               style={{
                 color: '#fff',
-                fontSize: '24px',
+                fontSize: '28px',
                 padding: 0,
                 width: 'auto',
-                height: 'auto'
+                height: 'auto',
+                display: 'flex',
+                alignItems: 'center'
               }}
             />
 
+            {/* 时间显示 */}
+            <span style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '13px', fontWeight: 500, letterSpacing: '0.5px' }}>
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             {/* 音量控制 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="volume-control" style={{ position: 'relative' }}>
               <Button
                 type="text"
                 icon={isMuted ? <AudioOutlined /> : <SoundOutlined />}
                 onClick={toggleMute}
                 style={{
                   color: '#fff',
-                  fontSize: '20px',
+                  fontSize: '22px',
                   padding: 0,
                   width: 'auto',
-                  height: 'auto'
+                  height: 'auto',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               />
-              <Slider
-                value={isMuted ? 0 : volume}
-                min={0}
-                max={1}
-                step={0.1}
-                onChange={handleVolumeChange}
-                style={{
-                  width: '80px',
-                  margin: 0
-                }}
-                trackStyle={{ backgroundColor: '#ff0050' }}
-                handleStyle={{ borderColor: '#ff0050' }}
-                railStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
-              />
+              <div className="volume-slider-container">
+                <Slider
+                  vertical
+                  value={isMuted ? 0 : volume}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  onChange={handleVolumeChange}
+                  style={{ height: '80px', margin: 0 }}
+                  trackStyle={{ backgroundColor: '#fe2c55' }}
+                  handleStyle={{ borderColor: '#fff', backgroundColor: '#fff' }}
+                  railStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+                />
+              </div>
             </div>
 
-            {/* 时间显示 */}
-            <span style={{ color: '#fff', fontSize: '14px' }}>
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* 设置 */}
-            <Tooltip title="设置">
+            <Tooltip title="倍速" color="rgba(0,0,0,0.8)">
               <Button
                 type="text"
-                icon={<SettingOutlined />}
                 style={{
                   color: '#fff',
-                  fontSize: '18px',
+                  fontSize: '14px',
+                  fontWeight: 600,
                   padding: 0,
                   width: 'auto',
                   height: 'auto'
                 }}
-              />
+              >
+                倍速
+              </Button>
             </Tooltip>
 
             {/* 全屏 */}
-            <Tooltip title={isFullscreen ? '退出全屏' : '全屏'}>
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏'} color="rgba(0,0,0,0.8)">
               <Button
                 type="text"
                 icon={<FullscreenOutlined />}
                 onClick={toggleFullscreen}
                 style={{
                   color: '#fff',
-                  fontSize: '18px',
+                  fontSize: '22px',
                   padding: 0,
                   width: 'auto',
-                  height: 'auto'
+                  height: 'auto',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               />
             </Tooltip>

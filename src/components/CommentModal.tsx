@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, Input, Button, Avatar, Divider, Tooltip } from 'antd'
+import { Drawer, Input, Button, Avatar, Divider, Tooltip } from 'antd'
 import { SendOutlined, HeartOutlined, HeartFilled, CloseOutlined } from '@ant-design/icons'
 import { Comment, Reply } from '../hooks/useVideoInteraction'
 
@@ -74,100 +74,70 @@ const CommentModal: React.FC<CommentModalProps> = ({
   }
 
   return (
-    <Modal
+    <Drawer
       open={visible}
-      onCancel={onClose}
-      footer={null}
-      width={400}
+      onClose={onClose}
+      width={360}
       title={
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#fff' }}>
           <span style={{ fontSize: '16px', fontWeight: 600 }}>评论 ({comments.length})</span>
-          <Button 
-            type="text" 
-            icon={<CloseOutlined />} 
-            onClick={onClose}
-            style={{ color: '#86909c' }}
-          />
         </div>
       }
-      closeIcon={null}
+      closeIcon={<CloseOutlined style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '16px' }} />}
       styles={{
-        body: { maxHeight: '60vh', overflowY: 'auto' }
+        header: {
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: '16px 20px',
+          backgroundColor: 'rgba(22, 24, 35, 0.95)'
+        },
+        body: {
+          padding: '0',
+          backgroundColor: 'rgba(22, 24, 35, 0.95)',
+          overflowY: 'auto'
+        },
+        wrapper: {
+          boxShadow: '-4px 0 16px rgba(0, 0, 0, 0.2)'
+        }
       }}
+      style={{
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)'
+      }}
+      maskStyle={{ backgroundColor: 'transparent' }} // Allow interaction with video
     >
-      {/* 添加评论输入框 */}
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-          <Avatar 
-            src="https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_user.jpeg" 
-            size={32}
-          />
-          <div style={{ flex: 1 }}>
-            <TextArea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="说点什么..."
-              autoSize={{ minRows: 2, maxRows: 4 }}
-              style={{ 
-                border: '1px solid #e1e5e9',
-                borderRadius: '8px',
-                fontSize: '14px'
-              }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-              <Button
-                type="primary"
-                size="small"
-                icon={<SendOutlined />}
-                onClick={handleAddComment}
-                disabled={!newComment.trim()}
-                style={{
-                  backgroundColor: '#ff0050',
-                  borderColor: '#ff0050',
-                  borderRadius: '16px',
-                  height: '32px',
-                  paddingLeft: '16px',
-                  paddingRight: '16px'
-                }}
-              >
-                发送
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Divider style={{ margin: '16px 0' }} />
-
       {/* 评论列表 */}
-      <div style={{ minHeight: '200px' }}>
+      <div style={{ padding: '20px 20px 100px' }}>
         {comments.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
-            color: '#86909c', 
-            padding: '40px 0',
+            color: 'rgba(255, 255, 255, 0.5)', 
+            padding: '60px 0',
             fontSize: '14px'
           }}>
             暂无评论，快来发表第一条评论吧~
           </div>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} style={{ marginBottom: '16px' }}>
+            <div key={comment.id} style={{ marginBottom: '24px' }}>
               {/* 主评论 */}
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                <Avatar src={comment.userAvatar} size={32} />
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                <Avatar 
+                  src={comment.userAvatar} 
+                  size={32} 
+                  style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                />
                 <div style={{ flex: 1 }}>
                   <div style={{ marginBottom: '4px' }}>
                     <span style={{ 
-                      fontSize: '14px', 
-                      fontWeight: 600, 
-                      color: '#1f2329' 
+                      fontSize: '13px', 
+                      fontWeight: 500, 
+                      color: 'rgba(255, 255, 255, 0.5)' 
                     }}>
                       {comment.userName}
                     </span>
                     <span style={{ 
                       fontSize: '12px', 
-                      color: '#86909c', 
+                      color: 'rgba(255, 255, 255, 0.3)', 
                       marginLeft: '8px' 
                     }}>
                       {formatTime(comment.createdAt)}
@@ -176,9 +146,10 @@ const CommentModal: React.FC<CommentModalProps> = ({
                   
                   <div style={{ 
                     fontSize: '14px', 
-                    color: '#1f2329', 
-                    lineHeight: '20px',
-                    marginBottom: '8px'
+                    color: 'rgba(255, 255, 255, 0.9)', 
+                    lineHeight: '1.5',
+                    marginBottom: '8px',
+                    whiteSpace: 'pre-wrap'
                   }}>
                     {comment.content}
                   </div>
@@ -189,12 +160,13 @@ const CommentModal: React.FC<CommentModalProps> = ({
                       size="small"
                       onClick={() => onToggleCommentLike(comment.id)}
                       style={{ 
-                        color: comment.isLiked ? '#ff0050' : '#86909c',
+                        color: comment.isLiked ? '#fe2c55' : 'rgba(255, 255, 255, 0.5)',
                         padding: 0,
                         height: 'auto',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '4px',
+                        fontSize: '12px'
                       }}
                     >
                       {comment.isLiked ? <HeartFilled /> : <HeartOutlined />}
@@ -206,7 +178,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                       size="small"
                       onClick={() => handleShowReply(comment.id, comment.userName)}
                       style={{ 
-                        color: '#86909c',
+                        color: 'rgba(255, 255, 255, 0.5)',
                         padding: 0,
                         height: 'auto',
                         fontSize: '12px'
@@ -221,7 +193,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                         size="small"
                         onClick={() => onDeleteComment(comment.id)}
                         style={{ 
-                          color: '#f53f3f',
+                          color: 'rgba(255, 255, 255, 0.3)',
                           padding: 0,
                           height: 'auto',
                           fontSize: '12px'
@@ -236,34 +208,34 @@ const CommentModal: React.FC<CommentModalProps> = ({
 
               {/* 回复列表 */}
               {comment.replies.length > 0 && (
-                <div style={{ marginTop: '12px', marginLeft: '40px' }}>
+                <div style={{ marginTop: '16px', marginLeft: '44px' }}>
                   {comment.replies.map((reply) => (
-                    <div key={reply.id} style={{ marginBottom: '12px' }}>
+                    <div key={reply.id} style={{ marginBottom: '16px' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                        <Avatar src={reply.userAvatar} size={24} />
+                        <Avatar src={reply.userAvatar} size={24} style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }} />
                         <div style={{ flex: 1 }}>
                           <div style={{ marginBottom: '4px' }}>
                             <span style={{ 
-                              fontSize: '13px', 
-                              fontWeight: 600, 
-                              color: '#1f2329' 
+                              fontSize: '12px', 
+                              fontWeight: 500, 
+                              color: 'rgba(255, 255, 255, 0.5)' 
                             }}>
                               {reply.userName}
                             </span>
                             {reply.replyTo && (
                               <>
-                                <span style={{ color: '#86909c', margin: '0 4px' }}>回复</span>
+                                <span style={{ color: 'rgba(255, 255, 255, 0.3)', margin: '0 4px', fontSize: '12px' }}>回复</span>
                                 <span style={{ 
-                                  fontSize: '13px', 
-                                  color: '#165dff'
+                                  fontSize: '12px', 
+                                  color: 'rgba(255, 255, 255, 0.7)'
                                 }}>
-                                  @{reply.replyTo}
+                                  {reply.replyTo}
                                 </span>
                               </>
                             )}
                             <span style={{ 
                               fontSize: '11px', 
-                              color: '#86909c', 
+                              color: 'rgba(255, 255, 255, 0.3)', 
                               marginLeft: '8px' 
                             }}>
                               {formatTime(reply.createdAt)}
@@ -272,8 +244,8 @@ const CommentModal: React.FC<CommentModalProps> = ({
                           
                           <div style={{ 
                             fontSize: '13px', 
-                            color: '#1f2329', 
-                            lineHeight: '18px',
+                            color: 'rgba(255, 255, 255, 0.9)', 
+                            lineHeight: '1.5',
                             marginBottom: '6px'
                           }}>
                             {reply.content}
@@ -285,7 +257,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                               size="small"
                               onClick={() => onToggleCommentLike(comment.id, reply.id)}
                               style={{ 
-                                color: reply.isLiked ? '#ff0050' : '#86909c',
+                                color: reply.isLiked ? '#fe2c55' : 'rgba(255, 255, 255, 0.5)',
                                 padding: 0,
                                 height: 'auto',
                                 display: 'flex',
@@ -303,7 +275,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                               size="small"
                               onClick={() => handleShowReply(comment.id, reply.userName)}
                               style={{ 
-                                color: '#86909c',
+                                color: 'rgba(255, 255, 255, 0.5)',
                                 padding: 0,
                                 height: 'auto',
                                 fontSize: '11px'
@@ -318,7 +290,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                                 size="small"
                                 onClick={() => onDeleteReply(comment.id, reply.id)}
                                 style={{ 
-                                  color: '#f53f3f',
+                                  color: 'rgba(255, 255, 255, 0.3)',
                                   padding: 0,
                                   height: 'auto',
                                   fontSize: '11px'
@@ -337,11 +309,12 @@ const CommentModal: React.FC<CommentModalProps> = ({
 
               {/* 回复输入框 */}
               {replyStates[comment.id]?.show && (
-                <div style={{ marginTop: '12px', marginLeft: '40px' }}>
+                <div style={{ marginTop: '12px', marginLeft: '44px' }}>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <Avatar 
                       src="https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_user.jpeg" 
                       size={24}
+                      style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
                     />
                     <div style={{ flex: 1 }}>
                       <TextArea
@@ -350,21 +323,29 @@ const CommentModal: React.FC<CommentModalProps> = ({
                         placeholder={`回复 @${replyStates[comment.id]?.replyTo}...`}
                         autoSize={{ minRows: 2, maxRows: 3 }}
                         style={{ 
-                          border: '1px solid #e1e5e9',
-                          borderRadius: '6px',
-                          fontSize: '13px'
+                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '8px',
+                          fontSize: '13px',
+                          color: '#fff'
                         }}
                       />
                       <div style={{ 
                         display: 'flex', 
                         justifyContent: 'flex-end', 
                         gap: '8px',
-                        marginTop: '6px' 
+                        marginTop: '8px' 
                       }}>
                         <Button
                           size="small"
                           onClick={() => handleHideReply(comment.id)}
-                          style={{ height: '28px', fontSize: '12px' }}
+                          style={{ 
+                            height: '28px', 
+                            fontSize: '12px',
+                            backgroundColor: 'transparent',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            color: 'rgba(255, 255, 255, 0.7)'
+                          }}
                         >
                           取消
                         </Button>
@@ -374,10 +355,11 @@ const CommentModal: React.FC<CommentModalProps> = ({
                           onClick={() => handleAddReply(comment.id)}
                           disabled={!replyStates[comment.id]?.content?.trim()}
                           style={{
-                            backgroundColor: '#ff0050',
-                            borderColor: '#ff0050',
+                            backgroundColor: '#fe2c55',
+                            borderColor: '#fe2c55',
                             height: '28px',
-                            fontSize: '12px'
+                            fontSize: '12px',
+                            color: '#fff'
                           }}
                         >
                           回复
@@ -391,7 +373,60 @@ const CommentModal: React.FC<CommentModalProps> = ({
           ))
         )}
       </div>
-    </Modal>
+
+      {/* 底部输入框 - 固定在底部 */}
+      <div style={{ 
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: '16px 20px',
+        backgroundColor: 'rgba(22, 24, 35, 0.98)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        display: 'flex',
+        gap: '12px',
+        alignItems: 'flex-end'
+      }}>
+        <Avatar 
+          src="https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_user.jpeg" 
+          size={32}
+          style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+        />
+        <div style={{ flex: 1, position: 'relative' }}>
+          <TextArea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="善语结善缘，恶语伤人心"
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              color: '#fff',
+              paddingRight: '40px'
+            }}
+          />
+          <div style={{ 
+            position: 'absolute', 
+            right: '8px', 
+            bottom: '4px'
+          }}>
+            <Button
+              type="text"
+              size="small"
+              icon={<SendOutlined />}
+              onClick={handleAddComment}
+              disabled={!newComment.trim()}
+              style={{
+                color: newComment.trim() ? '#fe2c55' : 'rgba(255, 255, 255, 0.3)',
+                fontSize: '16px'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </Drawer>
   )
 }
 

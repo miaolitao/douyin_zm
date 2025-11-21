@@ -200,23 +200,52 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
       width={800}
       style={{ top: 20 }}
       bodyStyle={{ padding: 0 }}
-      maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+      maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(10px)' }}
+      closeIcon={<CloseOutlined style={{ color: '#fff', fontSize: '20px' }} />}
     >
-      <div style={{ backgroundColor: '#000000', minHeight: '500px' }}>
+      <style>
+        {`
+          @keyframes fadeInSlide {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .search-result-item {
+            animation: fadeInSlide 0.4s ease-out forwards;
+            opacity: 0;
+          }
+          
+          .search-result-item:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 1;
+          }
+          
+          .search-tag:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+          }
+        `}
+      </style>
+      <div style={{ backgroundColor: '#161823', minHeight: '600px', borderRadius: '8px', overflow: 'hidden' }}>
         {/* 搜索框和筛选器 */}
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div style={{ padding: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
           {/* 主搜索框 */}
-          <div style={{ position: 'relative', marginBottom: '16px' }}>
+          <div style={{ position: 'relative', marginBottom: '20px' }}>
             <Input
               ref={inputRef}
               value={searchValue}
               onChange={handleInputChange}
               placeholder="搜索视频、用户、音乐、话题..."
-              prefix={<SearchOutlined style={{ color: '#888' }} />}
+              prefix={<SearchOutlined style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '18px' }} />}
               suffix={
                 searchValue && (
                   <CloseOutlined 
-                    style={{ color: '#888', cursor: 'pointer' }} 
+                    style={{ color: 'rgba(255, 255, 255, 0.5)', cursor: 'pointer' }} 
                     onClick={() => {
                       setSearchValue('')
                       setSearchResults([])
@@ -227,13 +256,17 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                 )
               }
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                borderRadius: '20px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid transparent',
+                borderRadius: '12px',
                 color: '#fff',
-                height: '44px',
-                fontSize: '16px'
+                height: '48px',
+                fontSize: '16px',
+                paddingLeft: '16px',
+                transition: 'all 0.3s'
               }}
+              onFocus={(e) => e.target.style.borderColor = '#fe2c55'}
+              onBlur={(e) => e.target.style.borderColor = 'transparent'}
             />
             
             {/* 搜索建议下拉 */}
@@ -243,37 +276,39 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                 top: '100%',
                 left: 0,
                 right: 0,
-                backgroundColor: '#1a1a1a',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                backgroundColor: '#1f212e',
+                borderRadius: '12px',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
                 zIndex: 1000,
-                marginTop: '4px',
-                maxHeight: '200px',
-                overflowY: 'auto'
+                marginTop: '8px',
+                maxHeight: '300px',
+                overflowY: 'auto',
+                border: '1px solid rgba(255, 255, 255, 0.08)'
               }}>
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
                     style={{
-                      padding: '8px 16px',
+                      padding: '12px 20px',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      borderBottom: index < suggestions.length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+                      gap: '12px',
                       transition: 'background-color 0.2s'
                     }}
                     onClick={() => handleSuggestionClick(suggestion)}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent'
                     }}
                   >
-                    {getSuggestionIcon(suggestion.type)}
-                    <span style={{ color: '#fff', flex: 1 }}>{suggestion.text}</span>
-                    <span style={{ color: '#888', fontSize: '12px' }}>{suggestion.count}</span>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                      {getSuggestionIcon(suggestion.type)}
+                    </div>
+                    <span style={{ color: '#fff', flex: 1, fontSize: '14px' }}>{suggestion.text}</span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '12px' }}>{suggestion.count}</span>
                   </div>
                 ))}
               </div>
@@ -281,10 +316,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
           </div>
           
           {/* 筛选器 */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FilterOutlined style={{ color: '#888', fontSize: '14px' }} />
-              <Text style={{ color: '#888', fontSize: '14px' }}>筛选:</Text>
+              <FilterOutlined style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px' }} />
+              <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px' }}>筛选:</Text>
             </div>
             
             <Select
@@ -295,11 +330,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                   handleSearch(searchValue, true)
                 }
               }}
-              style={{ width: 100 }}
-              size="small"
+              style={{ width: 110 }}
+              bordered={false}
+              dropdownStyle={{ backgroundColor: '#1f212e', border: '1px solid rgba(255, 255, 255, 0.08)' }}
             >
               {categoryOptions.map(option => (
-                <Option key={option} value={option}>{option}</Option>
+                <Option key={option} value={option} style={{ color: '#fff' }}>{option}</Option>
               ))}
             </Select>
             
@@ -311,50 +347,53 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                   handleSearch(searchValue, true)
                 }
               }}
-              style={{ width: 120 }}
-              size="small"
+              style={{ width: 110 }}
+              bordered={false}
+              dropdownStyle={{ backgroundColor: '#1f212e', border: '1px solid rgba(255, 255, 255, 0.08)' }}
             >
-              <Option value="relevance">相关度</Option>
-              <Option value="views">观看量</Option>
-              <Option value="likes">点赞数</Option>
-              <Option value="time">发布时间</Option>
+              <Option value="relevance" style={{ color: '#fff' }}>相关度</Option>
+              <Option value="views" style={{ color: '#fff' }}>观看量</Option>
+              <Option value="likes" style={{ color: '#fff' }}>点赞数</Option>
+              <Option value="time" style={{ color: '#fff' }}>发布时间</Option>
             </Select>
           </div>
         </div>
 
         {/* 搜索内容 */}
-        <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+        <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '0 24px 24px' }}>
           {!searchValue ? (
             // 默认显示搜索历史和热门搜索
-            <div>
+            <div style={{ paddingTop: '24px' }}>
               {/* 搜索历史 */}
               {searchHistory.length > 0 && (
-                <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '32px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <ClockCircleOutlined style={{ color: '#888' }} />
-                      <span style={{ color: '#fff', fontSize: '16px', fontWeight: 500 }}>搜索历史</span>
+                      <ClockCircleOutlined style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                      <span style={{ color: '#fff', fontSize: '15px', fontWeight: 500 }}>搜索历史</span>
                     </div>
                     <Button 
                       type="text" 
                       size="small"
                       onClick={clearHistory}
-                      style={{ color: '#888' }}
+                      style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '13px' }}
                     >
                       清除
                     </Button>
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                     {searchHistory.map((item, index) => (
                       <Tag
                         key={index}
+                        className="search-tag"
                         style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)',
-                          color: '#fff',
-                          borderRadius: '16px',
-                          padding: '6px 12px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                          border: 'none',
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: '4px',
+                          padding: '4px 12px',
                           cursor: 'pointer',
+                          fontSize: '13px',
                           transition: 'all 0.2s'
                         }}
                         onClick={() => handleHistoryClick(item)}
@@ -366,15 +405,13 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                 </div>
               )}
 
-              {searchHistory.length > 0 && <Divider style={{ borderColor: 'rgba(255, 255, 255, 0.1)', margin: 0 }} />}
-
               {/* 热门搜索 */}
-              <div style={{ padding: '20px' }}>
+              <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                  <FireOutlined style={{ color: '#ff0050' }} />
-                  <span style={{ color: '#fff', fontSize: '16px', fontWeight: 500 }}>热门搜索</span>
+                  <FireOutlined style={{ color: '#fe2c55' }} />
+                  <span style={{ color: '#fff', fontSize: '15px', fontWeight: 500 }}>热门搜索</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                   {hotSearches.map((item, index) => (
                     <div
                       key={index}
@@ -382,29 +419,33 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        padding: '8px 12px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '8px',
+                        padding: '10px 12px',
+                        backgroundColor: 'transparent',
+                        borderRadius: '6px',
                         cursor: 'pointer',
                         transition: 'background-color 0.2s'
                       }}
                       onClick={() => handleHistoryClick(item)}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
+                        e.currentTarget.style.backgroundColor = 'transparent'
                       }}
                     >
                       <span style={{ 
-                        color: index < 3 ? '#ff0050' : '#888', 
+                        color: index < 3 ? '#fe2c55' : 'rgba(255, 255, 255, 0.5)', 
                         fontSize: '14px', 
                         fontWeight: index < 3 ? 600 : 400,
-                        minWidth: '16px'
+                        minWidth: '20px',
+                        textAlign: 'center'
                       }}>
                         {index + 1}
                       </span>
-                      <span style={{ color: '#fff', flex: 1, fontSize: '14px' }}>{item}</span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.9)', flex: 1, fontSize: '14px' }}>{item}</span>
+                      {index < 2 && (
+                        <Tag color="#fe2c55" style={{ margin: 0, fontSize: '10px', lineHeight: '16px', height: '18px', border: 'none' }}>热</Tag>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -412,208 +453,180 @@ const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose }) => {
             </div>
           ) : (
             // 显示搜索结果
-            <div style={{ padding: '20px' }}>
+            <div style={{ paddingTop: '20px' }}>
               {/* 搜索结果头部信息 */}
               {!isSearching && searchResults.length > 0 && (
                 <div style={{ 
                   marginBottom: '20px', 
-                  padding: '12px 0',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                  paddingBottom: '12px',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
                 }}>
-                  <Text style={{ color: '#888', fontSize: '14px' }}>
-                    找到 <span style={{ color: '#ff0050', fontWeight: 'bold' }}>{searchResults.length}</span> 个相关结果
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '13px' }}>
+                    找到 <span style={{ color: '#fe2c55', fontWeight: 'bold' }}>{searchResults.length}</span> 个相关结果
                     {selectedCategory !== '全部' && (
-                      <span> · 分类: <span style={{ color: '#ff0050' }}>{selectedCategory}</span></span>
+                      <span> · 分类: <span style={{ color: '#fe2c55' }}>{selectedCategory}</span></span>
                     )}
                   </Text>
                 </div>
               )}
 
               {isSearching ? (
-                <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                <div style={{ textAlign: 'center', padding: '80px 0' }}>
                   <div style={{ 
                     width: '40px', 
                     height: '40px', 
-                    border: '3px solid rgba(255, 0, 80, 0.3)',
-                    borderTop: '3px solid #ff0050',
+                    border: '3px solid rgba(255, 255, 255, 0.1)',
+                    borderTop: '3px solid #fe2c55',
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite',
                     margin: '0 auto 20px'
                   }} />
-                  <Text style={{ color: '#888', fontSize: '16px' }}>正在搜索...</Text>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '14px' }}>正在搜索...</Text>
                 </div>
               ) : searchResults.length > 0 ? (
                 <div style={{ display: 'grid', gap: '16px' }}>
                   {searchResults.map(({ video, relevanceScore, matchedFields }, index) => (
                     <div
                       key={video.id}
+                      className="search-result-item"
                       style={{ 
                         display: 'flex',
                         gap: '16px',
-                        padding: '16px',
+                        padding: '12px',
                         backgroundColor: 'rgba(255, 255, 255, 0.03)',
                         borderRadius: '12px',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        border: '1px solid transparent'
+                        border: '1px solid transparent',
+                        animationDelay: `${index * 0.05}s`
                       }}
                       onClick={() => handleVideoClick(video.id)}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
-                        e.currentTarget.style.borderColor = 'rgba(255, 0, 80, 0.3)'
-                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.borderColor = 'rgba(254, 44, 85, 0.3)'
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)'
                         e.currentTarget.style.borderColor = 'transparent'
-                        e.currentTarget.style.transform = 'translateY(0)'
                       }}
                     >
                       {/* 视频封面 */}
-                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <div style={{ position: 'relative', flexShrink: 0, borderRadius: '8px', overflow: 'hidden' }}>
                         <img
                           src={video.poster}
                           alt={video.title}
                           style={{
-                            width: '120px',
-                            height: '80px',
+                            width: '160px',
+                            height: '100px',
                             objectFit: 'cover',
-                            borderRadius: '8px'
+                            transition: 'transform 0.3s'
                           }}
                         />
-                        <div style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          opacity: 0.8
-                        }}>
-                          <PlayCircleOutlined style={{ fontSize: '24px', color: '#fff' }} />
+                        <div 
+                          className="play-icon"
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            opacity: 0,
+                            transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                          }}
+                        >
+                          <PlayCircleOutlined style={{ fontSize: '32px', color: '#fff', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
                         </div>
                         {/* 视频时长 */}
                         <div style={{
                           position: 'absolute',
-                          bottom: '4px',
-                          right: '4px',
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          bottom: '6px',
+                          right: '6px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.6)',
                           color: '#fff',
                           padding: '2px 6px',
                           borderRadius: '4px',
-                          fontSize: '12px'
+                          fontSize: '11px',
+                          fontWeight: 500
                         }}>
                           {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
                         </div>
                       </div>
 
                       {/* 视频信息 */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        {/* 标题 */}
-                        <div 
-                          style={{ 
-                            color: '#fff', 
-                            fontSize: '16px', 
-                            fontWeight: 500,
-                            marginBottom: '8px',
-                            lineHeight: '1.4',
-                            display: '-webkit-box',
-                            WebkitBoxOrient: 'vertical',
-                            WebkitLineClamp: 2,
-                            overflow: 'hidden'
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: highlightText(video.title, searchValue)
-                          }}
-                        />
-                        
-                        {/* 作者信息 */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                          <Avatar src={video.author.avatar} size={24} />
-                          <span 
-                            style={{ color: '#888', fontSize: '14px' }}
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '4px 0' }}>
+                        <div>
+                          {/* 标题 */}
+                          <div 
+                            style={{ 
+                              color: '#fff', 
+                              fontSize: '16px', 
+                              fontWeight: 500,
+                              marginBottom: '8px',
+                              lineHeight: '1.4',
+                              display: '-webkit-box',
+                              WebkitBoxOrient: 'vertical',
+                              WebkitLineClamp: 2,
+                              overflow: 'hidden'
+                            }}
                             dangerouslySetInnerHTML={{
-                              __html: highlightText(video.author.name, searchValue)
+                              __html: highlightText(video.title, searchValue)
                             }}
                           />
-                          {video.author.verified && (
-                            <span style={{ color: '#ff0050', fontSize: '12px' }}>✓</span>
-                          )}
-                        </div>
-
-                        {/* 统计信息 */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <EyeOutlined style={{ color: '#888', fontSize: '14px' }} />
-                            <span style={{ color: '#888', fontSize: '13px' }}>
-                              {formatNumber(video.views)}
-                            </span>
+                          
+                          {/* 匹配标签 */}
+                          <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                             {matchedFields.includes('category') && (
+                               <Tag color="rgba(254, 44, 85, 0.2)" style={{ color: '#fe2c55', border: 'none', margin: 0, fontSize: '11px' }}>
+                                 {video.category}
+                               </Tag>
+                             )}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <HeartOutlined style={{ color: '#888', fontSize: '14px' }} />
-                            <span style={{ color: '#888', fontSize: '13px' }}>
-                              {formatNumber(video.likes)}
-                            </span>
-                          </div>
-                          <span style={{ color: '#888', fontSize: '13px' }}>
-                            {video.createdAt}
-                          </span>
                         </div>
-
-                        {/* 分类和匹配字段 */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <Tag 
-                            size="small" 
-                            style={{ 
-                              backgroundColor: 'rgba(255, 0, 80, 0.2)', 
-                              color: '#ff0050', 
-                              border: 'none',
-                              fontSize: '11px'
-                            }}
-                          >
-                            {video.category}
-                          </Tag>
-                          {matchedFields.map(field => (
-                            <Tag 
-                              key={field}
-                              size="small"
-                              style={{ 
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                                color: '#888', 
-                                border: 'none',
-                                fontSize: '10px'
+                        
+                        <div>
+                          {/* 作者信息 */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <Avatar src={video.author.avatar} size={20} style={{ border: '1px solid rgba(255,255,255,0.2)' }} />
+                            <span 
+                              style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}
+                              dangerouslySetInnerHTML={{
+                                __html: highlightText(video.author.name, searchValue)
                               }}
-                            >
-                              {field === 'title' ? '标题' : field === 'author' ? '作者' : field === 'category' ? '分类' : field}
-                            </Tag>
-                          ))}
+                            />
+                          </div>
+
+                          {/* 统计信息 */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <EyeOutlined style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '13px' }} />
+                              <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>
+                                {formatNumber(video.views)}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <HeartOutlined style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '13px' }} />
+                              <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>
+                                {formatNumber(video.likes)}
+                              </span>
+                            </div>
+                            <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '12px' }}>
+                              {video.createdAt}
+                            </span>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 相关度得分（开发模式显示） */}
-                      {process.env.NODE_ENV === 'development' && (
-                        <div style={{
-                          alignSelf: 'flex-start',
-                          backgroundColor: 'rgba(0, 255, 0, 0.2)',
-                          color: '#0f0',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontSize: '10px'
-                        }}>
-                          {relevanceScore.toFixed(1)}
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
               ) : (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  style={{ padding: '60px 20px' }}
+                  style={{ padding: '80px 0' }}
                   description={
                     <div style={{ textAlign: 'center' }}>
-                      <Text style={{ color: '#888', fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+                      <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '15px', display: 'block', marginBottom: '8px' }}>
                         未找到相关内容
                       </Text>
-                      <Text style={{ color: '#666', fontSize: '14px' }}>
+                      <Text style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '13px' }}>
                         尝试调整搜索词或筛选条件
                       </Text>
                     </div>
